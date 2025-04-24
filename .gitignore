@@ -1,0 +1,9 @@
+.air.toml
+tmp/
+.env
+*.env
+*.log
+*.local
+*.sqlite
+*.sqlite3
+*.db
