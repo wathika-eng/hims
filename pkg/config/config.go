@@ -3,6 +3,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -14,7 +15,7 @@ type Config struct {
 	DB_TYPE      string
 	DB_NAME      string
 	DB_USER      string
-	DB_PASS      string
+	DB_PASSWORD  string
 	DB_HOST      string
 	DB_PORT      string
 	REDIS_URL    string
@@ -28,16 +29,25 @@ func LoadConfigs() (*Config, error) {
 		return nil, fmt.Errorf("error initializing config: %v", err)
 	}
 	config := &Config{
-		DATABASE_URL: os.Getenv("DATABASE_URL"),
-		DB_TYPE:      os.Getenv("DB_TYPE"),
-		DB_NAME:      os.Getenv("DB_NAME"),
-		DB_USER:      os.Getenv("DB_USER"),
-		DB_PASS:      os.Getenv("DB_PASS"),
-		DB_HOST:      os.Getenv("DB_HOST"),
-		DB_PORT:      os.Getenv("DB_PORT"),
-		REDIS_URL:    os.Getenv("REDIS_URL"),
-		SECRET_KEY:   os.Getenv("SECRET_KEY"),
+		DATABASE_URL: getEnv("DATABASE_URL"),
+		DB_TYPE:      getEnv("DB_TYPE"),
+		DB_NAME:      getEnv("DB_NAME"),
+		DB_USER:      getEnv("DB_USER"),
+		DB_PASSWORD:  getEnv("DB_PASSWORD"),
+		DB_HOST:      getEnv("DB_HOST"),
+		DB_PORT:      getEnv("DB_PORT"),
+		REDIS_URL:    getEnv("REDIS_URL"),
+		SECRET_KEY:   getEnv("SECRET_KEY"),
 	}
 	// no error
 	return config, nil
+}
+
+// check if .env has the correct keys
+func getEnv(key string) string {
+	value, ok := os.LookupEnv(key)
+	if !ok || value == "" {
+		log.Printf("missing %v key in .env\n", key)
+	}
+	return value
 }
