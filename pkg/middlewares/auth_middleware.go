@@ -9,6 +9,7 @@ import (
 
 var cfg, _ = config.LoadConfigs()
 
+// verifies the token if therre is any
 func Auth(ctx *fiber.Ctx) error {
 	return jwtware.New(jwtware.Config{
 		SigningKey: jwtware.SigningKey{Key: []byte(cfg.SECRET_KEY)},

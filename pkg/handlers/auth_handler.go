@@ -39,3 +39,29 @@ func (h *Handler) NewPatient(ctx *fiber.Ctx) error {
 		"error": "false",
 	})
 }
+
+func (h *Handler) LoginDoctor(ctx *fiber.Ctx) error {
+	type req struct {
+		Email    string `json:"email" validate:"required,email"`
+		Password string `json:"password" validate:"required"`
+	}
+	var reqBody req
+
+	if err := ctx.BodyParser(&reqBody); err != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	if err := h.services.Validate(reqBody); err != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": err,
+		})
+	}
+	token, err := h.services.LoginUser(reqBody.Email, reqBody.Password)
+	if err != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return ctx.JSON(token)
+}

@@ -49,5 +49,3 @@ func (r *Repo) UpdatePatient(p *models.Patient) (*models.Patient, error) {
 
 	return p, nil
 }
-
-
