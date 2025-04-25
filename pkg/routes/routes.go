@@ -3,6 +3,7 @@ package routes
 import (
 	"hims/pkg/config"
 	"hims/pkg/handlers"
+	"hims/pkg/middlewares"
 	"hims/pkg/repo"
 	"hims/pkg/services"
 
@@ -26,8 +27,11 @@ func RegisterRoutes(r fiber.Router, cfg *config.Config, db *bun.DB) {
 	handlers := handlers.NewHandler(repo, services)
 
 	r.Get("/", handlers.TestAPI)
+	r.Post("api/signup", handlers.NewDoctor)
 	doc := r.Group("/api/")
+	doc.Use(middlewares.Auth)
 	{
-		doc.Post("/signup", handlers.NewDoctor)
+
+		doc.Post("/add-patient", handlers.NewPatient)
 	}
 }
