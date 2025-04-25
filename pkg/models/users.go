@@ -36,4 +36,14 @@ type Patient struct {
 	CreatedAt   time.Time    `json:"createdAt" bun:",nullzero,notnull,default:current_timestamp"`
 	UpdatedAt   bun.NullTime `json:"updatedAt"`
 	DeletedAt   time.Time    `json:"deletedAt" bun:",soft_delete"`
+	Programs    []*Program   `json:"patientPrograms" bun:"rel:has-many,join:id=patient_id"`
+}
+
+// a patient can have many programs
+type Program struct {
+	bun.BaseModel
+	ID        int    `bun:"id,pk,autoincrement"`
+	Name      string `json:"program" bun:",unique,notnull"`
+	Code      uint   `json:"programCode" bun:",unique,notull"`
+	PatientID int
 }

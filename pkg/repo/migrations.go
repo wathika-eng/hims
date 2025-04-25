@@ -13,6 +13,7 @@ func (r *Repo) Up() error {
 	modelsToMigrate := []any{
 		(*models.Doctor)(nil),
 		(*models.Patient)(nil),
+		(*models.Program)(nil),
 	}
 
 	for _, model := range modelsToMigrate {

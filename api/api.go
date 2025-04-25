@@ -15,8 +15,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/swagger"
 )
 
+// @title			Health Info Management System
+// @version		1.0
+// @description	Health Info Management System
+// @termsOfService	http://swagger.io/terms/
+// @contact.name	API Support
+// @contact.email	fiber@swagger.io
 func NewServer() {
 	// default logger
 	logg := slog.New(slog.NewJSONHandler(os.Stdout, nil))
@@ -43,7 +50,11 @@ func NewServer() {
 	app.Use(logger.New())
 	app.Use(recover.New())
 	// app.Use(helmet.New())
+	app.Get("/swagger/*", swagger.HandlerDefault) // default
+	// app.Get("/swagger/*", swagger.New())
+
 	routes.RegisterRoutes(app, cfg, db)
+
 	if err := app.Listen(fmt.Sprintf(":%v", cfg.PORT)); err != nil {
 		log.Fatalf("error while starting the server: %v", err)
 	}

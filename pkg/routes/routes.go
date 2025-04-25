@@ -11,13 +11,16 @@ import (
 )
 
 func RegisterRoutes(r fiber.Router, cfg *config.Config, db *bun.DB) {
-
 	repo := repo.NewRepo(db)
-
+	// create tables panics if err, so as to stop app
 	err := repo.Up()
 	if err != nil {
 		panic(err)
 	}
+	// err := repo.Reset()
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	services := services.NewServices(repo)
 	handlers := handlers.NewHandler(repo, services)
