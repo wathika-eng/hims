@@ -2,15 +2,15 @@
 package database
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"hims/pkg/config"
 	"log"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
 )
 
 func buildDsn(cfg config.Config) string {
@@ -32,19 +32,37 @@ func buildDsn(cfg config.Config) string {
 // initializes the database using the env variables
 func New(cfg config.Config) (*bun.DB, error) {
 	dsn := buildDsn(cfg)
-	// bun's custom connection with pgdriver
-	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
-	// return an error if db instance is nil
+	config, err := pgx.ParseConfig(dsn)
+	if err != nil || config == nil {
+		return nil, fmt.Errorf("error creating a connection: %v", err)
+	}
+	config.DefaultQueryExecMode = pgx.QueryExecModeSimpleProtocol
+	sqldb := stdlib.OpenDB(*config)
+	// // return an error if db instance is nil
 	if sqldb == nil {
 		return nil, errors.New("error initializing a database connection")
 	}
-	// ping establishes a connection
+	// // ping establishes a connection
 	if err := sqldb.Ping(); err != nil {
 		return nil, fmt.Errorf("error while pinging the db: %v", err)
 	}
 	db := bun.NewDB(sqldb, pgdialect.New())
-	if err := db.DB.Ping(); err != nil {
-		return nil, fmt.Errorf("error while pinging the db: %v", err)
-	}
+	// no error, return db connection
 	return db, nil
 }
+
+// // bun's custom connection with pgdriver
+// sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn)))
+// // return an error if db instance is nil
+// if sqldb == nil {
+// 	return nil, errors.New("error initializing a database connection")
+// }
+// // ping establishes a connection
+// if err := sqldb.Ping(); err != nil {
+// 	return nil, fmt.Errorf("error while pinging the db: %v", err)
+// }
+// db := bun.NewDB(sqldb, pgdialect.New())
+// if err := db.DB.Ping(); err != nil {
+// 	return nil, fmt.Errorf("error while pinging the db: %v", err)
+// }
+// return db, nil

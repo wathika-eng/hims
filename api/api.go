@@ -1,12 +1,16 @@
 package api
 
 import (
+	"context"
+	"fmt"
 	"hims/pkg/config"
 	"hims/pkg/database"
 	"hims/pkg/routes"
 	"log"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -29,19 +33,30 @@ func NewServer() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// close db once we exit
 	defer db.Close()
 
 	// initialize a new fiber app instance
 	app := fiber.New(fiber.Config{
-		ServerHeader: "hism",
-		AppName:      "HISM V1.0.0",
+		AppName: "HISM V1.0.0",
 	})
 	app.Use(logger.New())
 	app.Use(recover.New())
-	//r.Use(helmet.New())c
+	// app.Use(helmet.New())
 	routes.RegisterRoutes(app, cfg, db)
-
-	if err := app.Listen(":8000"); err != nil {
+	if err := app.Listen(fmt.Sprintf(":%v", cfg.PORT)); err != nil {
 		log.Fatalf("error while starting the server: %v", err)
+	}
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	go func() {
+		if err := app.Listen(fmt.Sprintf(":%v", cfg.PORT)); err != nil {
+			log.Fatalf("error while starting the server: %v", err)
+		}
+	}()
+	<-ctx.Done()
+	log.Println("shutting down...")
+	if err := app.Shutdown(); err != nil {
+		log.Fatalf("failed to shutdown fiber: %v", err)
 	}
 }

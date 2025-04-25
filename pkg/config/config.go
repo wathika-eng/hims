@@ -20,6 +20,7 @@ type Config struct {
 	DB_PORT      string
 	REDIS_URL    string
 	SECRET_KEY   string
+	PORT         string
 }
 
 // load the env variables to the config struct
@@ -38,6 +39,7 @@ func LoadConfigs() (*Config, error) {
 		DB_PORT:      getEnv("DB_PORT"),
 		REDIS_URL:    getEnv("REDIS_URL"),
 		SECRET_KEY:   getEnv("SECRET_KEY"),
+		PORT:         getEnv("PORT"),
 	}
 	// no error
 	return config, nil
