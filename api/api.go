@@ -1,6 +1,7 @@
 package api
 
 import (
+	"hims/pkg/config"
 	"hims/pkg/routes"
 	"log"
 
@@ -10,6 +11,13 @@ import (
 )
 
 func NewServer() {
+	// load env variables before app starts
+	cfg, err := config.LoadConfigs()
+	// if it returns an error, exit early
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// initialize a new fiber app instance
 	app := fiber.New(fiber.Config{
 		ServerHeader: "hism",
