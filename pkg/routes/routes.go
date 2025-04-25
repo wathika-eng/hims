@@ -26,4 +26,8 @@ func RegisterRoutes(r fiber.Router, cfg *config.Config, db *bun.DB) {
 	handlers := handlers.NewHandler(repo, services)
 
 	r.Get("/", handlers.TestAPI)
+	doc := r.Group("/api/")
+	{
+		doc.Post("/signup", handlers.NewDoctor)
+	}
 }

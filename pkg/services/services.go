@@ -3,11 +3,7 @@ package services
 
 import (
 	"hims/pkg/repo"
-
-	"github.com/go-playground/validator/v10"
 )
-
-var validate = validator.New()
 
 type Service struct {
 	repo *repo.Repo
