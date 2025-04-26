@@ -43,3 +43,12 @@ func (s *Service) CreatePatient(p *models.Patient) error {
 	p.Role = ""
 	return s.repo.InsertNewPatient(p)
 }
+
+func (s *Service) ModPatient(p *models.Patient, program *models.Program) (*models.Patient, error) {
+	p.Programs = append(p.Programs, program)
+	patient, err := s.repo.UpdatePatient(p)
+	if err != nil {
+		return nil, err
+	}
+	return patient, nil
+}

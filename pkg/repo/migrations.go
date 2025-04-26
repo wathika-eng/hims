@@ -35,6 +35,7 @@ func (r *Repo) Reset() error {
 	modelsToReset := []any{
 		(*models.Doctor)(nil),
 		(*models.Patient)(nil),
+		(*models.Program)(nil),
 	}
 
 	err := r.db.ResetModel(ctx, modelsToReset...)

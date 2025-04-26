@@ -26,7 +26,7 @@ func TestBuildDsn(t *testing.T) {
 // test will pass since postgres is available locally and using peer/indent auth method
 func TestNew_Success(t *testing.T) {
 	cfg := config.Config{
-		DATABASE_URL: "postgres://postgres:pass@localhost:5432/postgres",
+		DATABASE_URL: "postgres://postgres:pass@localhost:5432/postgres?sslmode=disable",
 	}
 
 	database, err := New(cfg)

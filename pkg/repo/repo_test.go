@@ -63,8 +63,8 @@ func TestCustomerRepo(t *testing.T) {
 	assert.Len(t, patients, 1, "there should be exactly one patient")
 
 	// // Check if the patient data is correct
-	// patient := patients[0]
-	// assert.Equal(t, "Mike", patient.FirstName)
-	// assert.Equal(t, "Go", patient.LastName)
+	patient := patients[0]
+	assert.Equal(t, "Mike", patient.FirstName)
+	assert.Equal(t, "Go", patient.LastName)
 
 }

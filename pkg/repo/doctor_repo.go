@@ -18,7 +18,7 @@ func (r *Repo) LookupDoctor(email, specialization string) (models.Doctor, error)
 	var doctor models.Doctor
 	err := r.db.NewSelect().
 		Model(&doctor).WhereOr("email = ?", email).
-		WhereOr("specialization = ?", specialization).
+		WhereOr("specialization = ?", specialization).Limit(1).
 		Scan(context.Background())
 	if err != nil {
 		return models.Doctor{}, fmt.Errorf("no doctor found with email: %v", email)
@@ -37,18 +37,22 @@ func (r *Repo) InsertNewProgram(p *models.Program) error {
 func (r *Repo) FetchPrograms() ([]models.Program, error) {
 	var programs []models.Program
 
-	_, err := r.db.NewSelect().Model(&programs).Order("id ASC").
-		Exec(context.Background())
+	err := r.db.NewSelect().Model(&programs).Order("id ASC").
+		Scan(context.Background())
 	if err != nil {
-		return nil, err
+		return []models.Program{}, err
 	}
 	return programs, nil
 }
 
-func (r *Repo) LookupProgram(p *models.Program) (*models.Program, error) {
-	err := r.db.NewSelect().Model(p).Where("name = ?", p.Name).Scan(context.Background())
+func (r *Repo) LookupProgram(name string, code int) (models.Program, error) {
+	var program models.Program
+
+	err := r.db.NewSelect().Model(program).
+		WhereOr("name = ?", name).WhereOr("code = ?", code).Limit(1).
+		Scan(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("no program found with name: %v", p.ID)
+		return models.Program{}, fmt.Errorf("no program found with name: %v", name)
 	}
-	return p, nil
+	return program, nil
 }

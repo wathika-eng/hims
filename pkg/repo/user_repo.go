@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"hims/pkg/models"
 	"log"
-
-	"github.com/uptrace/bun"
 )
 
 func (r *Repo) InsertNewPatient(p *models.Patient) error {
@@ -21,44 +19,51 @@ func (r *Repo) InsertNewPatient(p *models.Patient) error {
 func (r *Repo) FetchPatients() ([]models.Patient, error) {
 	var patients []models.Patient
 
-	_, err := r.db.NewSelect().Model(&patients).Order("id ASC").
-		Exec(context.Background())
+	query := `SELECT * FROM patients ORDER BY id ASC`
+	err := r.db.NewRaw(query).Scan(context.Background(), &patients)
 	if err != nil {
-		return nil, err
+		log.Println("Error executing query:", err)
+		return []models.Patient{}, err
 	}
+
 	return patients, nil
 }
 
-func (r *Repo) LookupPatient(phoneNum, idNum string) (*models.Patient, error) {
-	log.Printf("phone number: %v, ID Number: %v", phoneNum, idNum)
-	var patients models.Patient
+func (r *Repo) LookupPatient(phoneNum, idNum string) (models.Patient, error) {
+	log.Printf("phone: %v, id: %v", phoneNum, idNum)
+	var patient models.Patient
 
-	err := r.db.NewSelect().Model(&patients).
-		WhereGroup(" OR ", func(q *bun.SelectQuery) *bun.SelectQuery {
-			return q.
-				WhereOr("phone_number = ?", phoneNum).
-				WhereOr("id_number = ?", idNum)
-		}).
-		Scan(context.Background())
-
-	if err != nil {
-		return nil, errors.New("no patient found")
+	q := r.db.NewSelect().Model(&patient)
+	if phoneNum != "" {
+		q = q.Where("phone_number = ?", phoneNum)
+	} else if idNum != "" {
+		q = q.Where("id_number = ?", idNum)
+	} else {
+		return models.Patient{}, errors.New("no search parameters provided")
 	}
-	return &patients, nil
+
+	err := q.Limit(1).Scan(context.Background())
+	if err != nil {
+		log.Println(err.Error())
+		return models.Patient{}, fmt.Errorf("failed to find patient: %w", err)
+	}
+
+	return patient, nil
 }
 
 func (r *Repo) UpdatePatient(p *models.Patient) (*models.Patient, error) {
-	p, err := r.LookupPatient(p.PhoneNumber, p.IDNumber)
+	_, err := r.LookupPatient(p.PhoneNumber, p.IDNumber)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := r.db.NewUpdate().Model(p).WherePK().Exec(context.Background())
+	resp, err := r.db.NewUpdate().Model(p).Set("programs = ?", p.Programs).
+		WherePK().Exec(context.Background())
 	if err != nil {
 		return nil, err
 	}
 	rowsAffected, _ := resp.RowsAffected()
 	if rowsAffected == 0 {
-		return nil, fmt.Errorf("no patient found with ID %d", p.ID)
+		return nil, errors.New("update not done")
 	}
 
 	return p, nil

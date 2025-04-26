@@ -37,6 +37,8 @@ func RegisterRoutes(r fiber.Router, cfg *config.Config, db *bun.DB) {
 		doc.Post("/add-patient", handler.NewPatient)
 		doc.Post("/enroll", handler.AddPatientProgram)
 		doc.Get("/patient", handler.Profile)
-		doc.Get("/profile?email", handler.Profile)
+		doc.Get("/programs", handler.GetPrograms)
+		doc.Get("/patients", handler.GetPatients)
+		// doc.Get("/profile?email", handler.Profile)
 	}
 }
