@@ -32,7 +32,7 @@ type Patient struct {
 	IDNumber    string       `json:"idNumber" validate:"required,min=8,max=10" bun:",unique,notnull"`
 	PhoneNumber string       `json:"phoneNumber" validate:"required,min=3,max=15" bun:",unique,notnull"`
 	Gender      string       `json:"gender" validate:"required,max=6" bun:",notnull"`
-	Age         uint8        `json:"age" validate:"required,max=3" bun:",notnull"`
+	Age         uint8        `json:"age" validate:"required" bun:",notnull"`
 	Role        string       `json:"role" bun:",notnull,default:'patient'"`
 	DateOfBirth time.Time    `json:"dateOfBirth,omitempty"`
 	CreatedAt   time.Time    `json:"createdAt" bun:",nullzero,notnull,default:current_timestamp"`

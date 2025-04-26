@@ -1,6 +1,6 @@
 # Health Information System
 
-#### Technologies used
+## Technologies used
 
 - Golang 1.24 <https://go.dev/dl/>
 - Make <https://www.gnu.org/software/make/>
@@ -8,7 +8,7 @@
 - Docker <https://docs.docker.com/desktop/>
 - Air (live reload) <https://github.com/air-verse/air>
 
-#### Setup local development
+### Setup local development
 
 1. Clone the repository
 
@@ -54,3 +54,5 @@
 #### Resources used
 
 <https://12factor.net/>
+<https://bun.uptrace.dev/guide/golang-orm.html>
+<https://testcontainers.com/guides/getting-started-with-testcontainers-for-go/>

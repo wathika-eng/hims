@@ -23,7 +23,7 @@ func RegisterRoutes(r fiber.Router, cfg *config.Config, db *bun.DB) {
 	// 	panic(err)
 	// }
 
-	services := services.NewServices(repo)
+	services := services.NewServices(repo, cfg)
 	handler := handlers.NewHandler(repo, services)
 
 	r.Get("/", handler.TestAPI)

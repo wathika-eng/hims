@@ -45,7 +45,7 @@ func (h *Handler) NewPatient(ctx *fiber.Ctx) error {
 		})
 	}
 	return ctx.JSON(fiber.Map{
-		"data":  "patient created successfully",
+		"data":  fmt.Sprintf("patient %v %v successfully created", reqBody.FirstName, reqBody.LastName),
 		"error": "false",
 	})
 }
@@ -67,11 +67,13 @@ func (h *Handler) LoginDoctor(ctx *fiber.Ctx) error {
 			"error": err,
 		})
 	}
-	_, err := h.services.LoginUser(reqBody.Email, reqBody.Password)
+	token, err := h.services.LoginUser(reqBody.Email, reqBody.Password)
 	if err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
-	return ctx.JSON("")
+	return ctx.JSON(fiber.Map{
+		"accessToken": token,
+	})
 }
