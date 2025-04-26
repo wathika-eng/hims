@@ -19,8 +19,8 @@ func (r *Repo) InsertNewPatient(p *models.Patient) error {
 func (r *Repo) FetchPatients() ([]models.Patient, error) {
 	var patients []models.Patient
 
-	query := `SELECT * FROM patients ORDER BY id ASC`
-	err := r.db.NewRaw(query).Scan(context.Background(), &patients)
+	err := r.db.NewSelect().Model(&patients).Relation("Programs").
+		Scan(context.Background())
 	if err != nil {
 		log.Println("Error executing query:", err)
 		return []models.Patient{}, err
@@ -33,15 +33,8 @@ func (r *Repo) LookupPatient(phoneNum, idNum string) (models.Patient, error) {
 	log.Printf("phone: %v, id: %v", phoneNum, idNum)
 	var patient models.Patient
 
-	q := r.db.NewSelect().Model(&patient)
-	if phoneNum != "" {
-		q = q.Where("phone_number = ?", phoneNum)
-	} else if idNum != "" {
-		q = q.Where("id_number = ?", idNum)
-	} else {
-		return models.Patient{}, errors.New("no search parameters provided")
-	}
-
+	q := r.db.NewSelect().Model(&patient).Relation("Programs").
+		WhereOr("id_number = ?", idNum).WhereOr("phone_number = ?", phoneNum)
 	err := q.Limit(1).Scan(context.Background())
 	if err != nil {
 		log.Println(err.Error())
@@ -51,12 +44,12 @@ func (r *Repo) LookupPatient(phoneNum, idNum string) (models.Patient, error) {
 	return patient, nil
 }
 
-func (r *Repo) UpdatePatient(p *models.Patient) (*models.Patient, error) {
+func (r *Repo) UpdatePatient(p *models.Patient, program *models.Program) (*models.Patient, error) {
 	_, err := r.LookupPatient(p.PhoneNumber, p.IDNumber)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := r.db.NewUpdate().Model(p).Set("programs = ?", p.Programs).
+	resp, err := r.db.NewUpdate().Model(p).
 		WherePK().Exec(context.Background())
 	if err != nil {
 		return nil, err
@@ -65,6 +58,15 @@ func (r *Repo) UpdatePatient(p *models.Patient) (*models.Patient, error) {
 	if rowsAffected == 0 {
 		return nil, errors.New("update not done")
 	}
-
+	patientProgram := models.PatientProgram{
+		PatientID: p.ID,
+		Patient:   p,
+		ProgramID: program.ID,
+		Program:   program,
+	}
+	_, err = r.db.NewInsert().Model(&patientProgram).Exec(context.Background())
+	if err != nil {
+		return nil, err
+	}
 	return p, nil
 }

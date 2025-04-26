@@ -9,9 +9,10 @@ import (
 
 func (r *Repo) Up() error {
 	ctx := context.Background()
-
+	r.db.RegisterModel((*models.PatientProgram)(nil))
 	modelsToMigrate := []any{
 		(*models.Doctor)(nil),
+		(*models.PatientProgram)(nil),
 		(*models.Patient)(nil),
 		(*models.Program)(nil),
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"hims/pkg/models"
+	"log"
 )
 
 func (r *Repo) InsertNewDoctor(d *models.Doctor) error {
@@ -45,14 +46,18 @@ func (r *Repo) FetchPrograms() ([]models.Program, error) {
 	return programs, nil
 }
 
-func (r *Repo) LookupProgram(name string, code int) (models.Program, error) {
+func (r *Repo) LookupProgram(name string, _ int) (models.Program, error) {
+	log.Printf("Looking up program by name: %s", name)
+
 	var program models.Program
 
-	err := r.db.NewSelect().Model(program).
-		WhereOr("name = ?", name).WhereOr("code = ?", code).Limit(1).
+	err := r.db.NewSelect().Model(&program).
+		Where("name = ?", name).Limit(1).
 		Scan(context.Background())
+
 	if err != nil {
-		return models.Program{}, fmt.Errorf("no program found with name: %v", name)
+		return models.Program{}, fmt.Errorf("no program found with name: '%s'", name)
 	}
+
 	return program, nil
 }

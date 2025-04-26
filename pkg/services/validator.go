@@ -2,8 +2,6 @@ package services
 
 import "github.com/go-playground/validator/v10"
 
-var validate = validator.New()
-
 type (
 	ErrorResponse struct {
 		FailedField string `json:"failedField"`
@@ -24,7 +22,7 @@ type (
 func (s *Service) Validate(data any) []ErrorResponse {
 	var validationErrors []ErrorResponse
 
-	err := validate.Struct(data)
+	err := s.Validator.Struct(data)
 	if err != nil {
 		for _, fieldErr := range err.(validator.ValidationErrors) {
 			validationErrors = append(validationErrors, ErrorResponse{

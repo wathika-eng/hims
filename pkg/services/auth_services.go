@@ -46,7 +46,7 @@ func (s *Service) CreatePatient(p *models.Patient) error {
 
 func (s *Service) ModPatient(p *models.Patient, program *models.Program) (*models.Patient, error) {
 	p.Programs = append(p.Programs, program)
-	patient, err := s.repo.UpdatePatient(p)
+	patient, err := s.repo.UpdatePatient(p, program)
 	if err != nil {
 		return nil, err
 	}

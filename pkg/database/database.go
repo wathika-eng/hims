@@ -11,6 +11,7 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/uptrace/bun/extra/bundebug"
 )
 
 func buildDsn(cfg config.Config) string {
@@ -43,6 +44,7 @@ func New(cfg config.Config) (*bun.DB, error) {
 		return nil, fmt.Errorf("error while pinging the db: %v", err)
 	}
 	db := bun.NewDB(sqldb, pgdialect.New())
+	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 	if err := db.DB.Ping(); err != nil {
 		return nil, fmt.Errorf("error while pinging the db: %v", err)
 	}
