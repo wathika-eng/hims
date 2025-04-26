@@ -20,7 +20,7 @@ type Doctor struct {
 	Specialization string       `json:"specialization" validate:"required,min=3" bun:",notnull"`
 	CreatedAt      time.Time    `json:"createdAt" bun:",nullzero,notnull,default:current_timestamp"`
 	UpdatedAt      bun.NullTime `json:"updatedAt"`
-	DeletedAt      time.Time    `json:"deletedAt" bun:",soft_delete"`
+	DeletedAt      bun.NullTime `json:"deletedAt" bun:",soft_delete"`
 }
 
 // age is uint (non-negative) and can't go beyond 255
@@ -29,15 +29,15 @@ type Patient struct {
 	ID          int          `bun:"id,pk,autoincrement"`
 	FirstName   string       `json:"firstName" validate:"required,min=3" bun:",notnull"`
 	LastName    string       `json:"lastName" validate:"required,min=3" bun:",notnull"`
-	IDNumber    string       `json:"idNumber" validate:"required,min=8,max=10" bun:",unique,notnull"`
-	PhoneNumber string       `json:"phoneNumber" validate:"required,min=3,max=15" bun:",unique,notnull"`
+	IDNumber    string       `json:"idNumber" validate:"required,min=8" bun:",unique,notnull"`
+	PhoneNumber string       `json:"phoneNumber" validate:"required,min=7" bun:",unique,notnull"`
 	Gender      string       `json:"gender" validate:"required,max=6" bun:",notnull"`
 	Age         uint8        `json:"age" validate:"required" bun:",notnull"`
 	Role        string       `json:"role" bun:",notnull,default:'patient'"`
-	DateOfBirth time.Time    `json:"dateOfBirth,omitempty"`
+	DateOfBirth *time.Time   `json:"dateOfBirth"`
 	CreatedAt   time.Time    `json:"createdAt" bun:",nullzero,notnull,default:current_timestamp"`
 	UpdatedAt   bun.NullTime `json:"updatedAt"`
-	DeletedAt   time.Time    `json:"deletedAt" bun:",soft_delete"`
+	DeletedAt   bun.NullTime `json:"deletedAt" bun:",soft_delete"`
 	Programs    []*Program   `json:"patientPrograms" bun:"rel:has-many,join:id=patient_id"`
 }
 
@@ -46,6 +46,8 @@ type Program struct {
 	bun.BaseModel
 	ID        int    `bun:"id,pk,autoincrement"`
 	Name      string `json:"program" validate:"required,min=3" bun:",unique,notnull"`
-	Code      uint   `json:"programCode" validate:"required,max=3" bun:",unique,notnull"`
+	Code      uint   `json:"programCode" validate:"required,lte=9999" bun:",unique,notnull"`
 	PatientID int
+	// to later track doctor who created it
+	// DoctorID  int
 }

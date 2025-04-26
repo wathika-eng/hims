@@ -29,10 +29,14 @@ func RegisterRoutes(r fiber.Router, cfg *config.Config, db *bun.DB) {
 	r.Get("/", handler.TestAPI)
 	r.Post("api/signup", handler.NewDoctor)
 	r.Post("api/login", handler.LoginDoctor)
+
 	doc := r.Group("/api/")
 	doc.Use(middlewares.Auth)
 	{
-
+		doc.Post("/add-program", handler.AddProgram)
 		doc.Post("/add-patient", handler.NewPatient)
+		doc.Post("/enroll", handler.AddPatientProgram)
+		doc.Get("/patient", handler.Profile)
+		doc.Get("/profile?email", handler.Profile)
 	}
 }

@@ -17,13 +17,15 @@ func (h *Handler) NewDoctor(ctx *fiber.Ctx) error {
 
 	if err := h.services.Validate(reqBody); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
-			"error": err,
+			"error": "true",
+			"data":  err,
 		})
 	}
 
 	if err := h.services.CreateDoctor(&reqBody); err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": "true",
+			"data":  err.Error(),
 		})
 	}
 
@@ -41,7 +43,14 @@ func (h *Handler) NewPatient(ctx *fiber.Ctx) error {
 	}
 	if err := h.services.Validate(reqBody); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
-			"error": err,
+			"error": "true",
+			"date":  err,
+		})
+	}
+	if err := h.services.CreatePatient(&reqBody); err != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": "true",
+			"data":  err.Error(),
 		})
 	}
 	return ctx.JSON(fiber.Map{
@@ -59,21 +68,50 @@ func (h *Handler) LoginDoctor(ctx *fiber.Ctx) error {
 
 	if err := ctx.BodyParser(&reqBody); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": "true",
+			"data":  err.Error(),
 		})
 	}
 	if err := h.services.Validate(reqBody); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
-			"error": err,
+			"error": "true",
+			"data":  err,
 		})
 	}
 	token, err := h.services.LoginUser(reqBody.Email, reqBody.Password)
 	if err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
-			"error": err.Error(),
+			"error": "true",
+			"data":  err.Error(),
 		})
 	}
 	return ctx.JSON(fiber.Map{
 		"accessToken": token,
+	})
+}
+
+func (h *Handler) AddProgram(ctx *fiber.Ctx) error {
+	var reqBody models.Program
+	if err := ctx.BodyParser(&reqBody); err != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": "true",
+			"data":  err.Error(),
+		})
+	}
+	if err := h.services.Validate(reqBody); err != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": "true",
+			"data":  err,
+		})
+	}
+	if err := h.repo.InsertNewProgram(&reqBody); err != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": "true",
+			"data":  err.Error(),
+		})
+	}
+	return ctx.JSON(fiber.Map{
+		"error": "false",
+		"data":  fmt.Sprintf("added %v program", reqBody.Name),
 	})
 }

@@ -7,6 +7,7 @@ import (
 
 // calls the insert function on repo, if validate checks pass
 func (s *Service) CreateDoctor(d *models.Doctor) error {
+	d.Role = ""
 	hashedPass, err := hashPass(d.Password)
 	if err != nil {
 		return err
@@ -31,4 +32,14 @@ func (s *Service) LoginUser(email, password string) (string, error) {
 		return "", err
 	}
 	return token, nil
+}
+
+func (s *Service) CreatePatient(p *models.Patient) error {
+	cleanNum, err := cleanUpPhone(p.PhoneNumber)
+	if err != nil {
+		return err
+	}
+	p.PhoneNumber = cleanNum
+	p.Role = ""
+	return s.repo.InsertNewPatient(p)
 }

@@ -2,12 +2,16 @@ package repo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"hims/pkg/models"
+	"log"
+
+	"github.com/uptrace/bun"
 )
 
 func (r *Repo) InsertNewPatient(p *models.Patient) error {
-	_, err := r.db.NewInsert().Model(&p).Exec(context.Background())
+	_, err := r.db.NewInsert().Model(p).Exec(context.Background())
 	if err != nil {
 		return err
 	}
@@ -25,16 +29,26 @@ func (r *Repo) FetchPatients() ([]models.Patient, error) {
 	return patients, nil
 }
 
-func (r *Repo) LookupPatient(p *models.Patient) (*models.Patient, error) {
-	err := r.db.NewSelect().Model(&p).WherePK().Scan(context.Background())
+func (r *Repo) LookupPatient(phoneNum, idNum string) (*models.Patient, error) {
+	log.Printf("phone number: %v, ID Number: %v", phoneNum, idNum)
+	var patients models.Patient
+
+	err := r.db.NewSelect().Model(&patients).
+		WhereGroup(" OR ", func(q *bun.SelectQuery) *bun.SelectQuery {
+			return q.
+				WhereOr("phone_number = ?", phoneNum).
+				WhereOr("id_number = ?", idNum)
+		}).
+		Scan(context.Background())
+
 	if err != nil {
-		return nil, fmt.Errorf("no patient found with ID: %v", p.ID)
+		return nil, errors.New("no patient found")
 	}
-	return p, nil
+	return &patients, nil
 }
 
 func (r *Repo) UpdatePatient(p *models.Patient) (*models.Patient, error) {
-	p, err := r.LookupPatient(p)
+	p, err := r.LookupPatient(p.PhoneNumber, p.IDNumber)
 	if err != nil {
 		return nil, err
 	}
