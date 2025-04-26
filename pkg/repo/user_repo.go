@@ -7,7 +7,7 @@ import (
 )
 
 func (r *Repo) InsertNewPatient(p *models.Patient) error {
-	_, err := r.db.NewInsert().Model(p).Exec(context.Background())
+	_, err := r.db.NewInsert().Model(&p).Exec(context.Background())
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (r *Repo) FetchPatients() ([]models.Patient, error) {
 }
 
 func (r *Repo) LookupPatient(p *models.Patient) (*models.Patient, error) {
-	err := r.db.NewSelect().Model(p).WherePK().Scan(context.Background())
+	err := r.db.NewSelect().Model(&p).WherePK().Scan(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("no patient found with ID: %v", p.ID)
 	}

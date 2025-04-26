@@ -22,3 +22,8 @@ air: deps
 clean:
 	@echo "🧹 Cleaning up..."
 	@rm -f $(MAIN)
+
+test:
+	@echo "🧪 Running tests..."
+	@go test ./... -v
+	@echo "✅ All tests passed!"

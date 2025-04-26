@@ -14,11 +14,14 @@ func (r *Repo) InsertNewDoctor(d *models.Doctor) error {
 	return nil
 }
 
-func (r *Repo) LookupDoctor(email, specialization string) (*models.Doctor, error) {
-	var doctor *models.Doctor
-	err := r.db.NewSelect().Model(doctor).Where("email = ?", email).Scan(context.Background())
+func (r *Repo) LookupDoctor(email, specialization string) (models.Doctor, error) {
+	var doctor models.Doctor
+	err := r.db.NewSelect().
+		Model(&doctor).
+		Where("email = ?", email).
+		Scan(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("no doctor found with email: %v", email)
+		return models.Doctor{}, fmt.Errorf("no doctor found with email: %v", email)
 	}
 	return doctor, nil
 }

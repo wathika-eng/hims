@@ -24,15 +24,15 @@ func RegisterRoutes(r fiber.Router, cfg *config.Config, db *bun.DB) {
 	// }
 
 	services := services.NewServices(repo)
-	handlers := handlers.NewHandler(repo, services)
+	handler := handlers.NewHandler(repo, services)
 
-	r.Get("/", handlers.TestAPI)
-	r.Post("api/signup", handlers.NewDoctor)
-	r.Post("api/login", handlers.LoginDoctor)
+	r.Get("/", handler.TestAPI)
+	r.Post("api/signup", handler.NewDoctor)
+	r.Post("api/login", handler.LoginDoctor)
 	doc := r.Group("/api/")
 	doc.Use(middlewares.Auth)
 	{
 
-		doc.Post("/add-patient", handlers.NewPatient)
+		doc.Post("/add-patient", handler.NewPatient)
 	}
 }
