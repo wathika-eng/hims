@@ -48,8 +48,7 @@ func TestCustomerRepo(t *testing.T) {
 	sqldb := stdlib.OpenDB(*config)
 	db := bun.NewDB(sqldb, pgdialect.New())
 	repo := NewRepo(db)
-	repo.db.NewCreateTable().
-		Model((*models.Patient)(nil)).IfNotExists().Exec(ctx)
+	repo.Up()
 	// Insert a new patient
 	err = repo.InsertNewPatient(&models.Patient{
 		FirstName: "Mike",

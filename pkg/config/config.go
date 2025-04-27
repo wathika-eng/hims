@@ -40,14 +40,14 @@ func LoadConfigs() (*Config, error) {
 		DB_NAME:      viper.GetString("DB_NAME"),
 		DB_USER:      viper.GetString("DB_USER"),
 		DB_PASSWORD:  viper.GetString("DB_PASSWORD"),
-		DB_HOST:      viper.GetString("DB_HOST"), // Should be "db" in Docker Compose
+		DB_HOST:      viper.GetString("DB_HOST"),
 		DB_PORT:      viper.GetString("DB_PORT"),
 		REDIS_URL:    viper.GetString("REDIS_URL"),
 		SECRET_KEY:   viper.GetString("SECRET_KEY"),
 		PORT:         viper.GetString("PORT"),
 	}
 
-	// Validate critical DB fields
+	// critical DB fields, causes panic if missing
 	if config.DB_HOST == "" {
 		return nil, fmt.Errorf("DB_HOST is required")
 	}
@@ -57,12 +57,3 @@ func LoadConfigs() (*Config, error) {
 
 	return config, nil
 }
-
-// // check if .env has the correct keys
-// func viper.GetString(key string) string {
-// 	value, ok := os.LookupEnv(key)
-// 	if !ok || value == "" {
-// 		log.Printf("missing %v key in .env\n", key)
-// 	}
-// 	return value
-// }

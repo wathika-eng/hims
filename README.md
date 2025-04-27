@@ -8,15 +8,18 @@
 - Docker <https://docs.docker.com/desktop/>
 - Air (live reload) <https://github.com/air-verse/air>
 
-## Powerpoint presentation:
+## Powerpoint presentation: https://docs.google.com/presentation/d/13AXW5XdrwVaTFrY5SfnqQbtQ2RmhCLUZSyFV4tloCIc/edit?usp=sharing
 
-## Database design:
+## Database design: drawSQL-image-export-2025-04-27.png
 
 ## API testing: 
 
 ## Live API: 
 
 ### Setup local development
+
+Ensure Make, Go, PostgreSQL, and Docker are installed on your machine.
+Without Make and Docker, you can't run the application.
 
 1. Clone the repository
 
@@ -38,6 +41,7 @@
 
    ```bash
     cp .env.example .env
+    cp .env.example .env.local
     ```
 
 4. Create a PostgreSQL database
@@ -57,6 +61,9 @@
 
     ```bash
     COMPOSE_BAKE=true docker-compose up -d
+    # or
+    make docker-build
+    make docker-run
     ```
     <!-- or
     ```bash

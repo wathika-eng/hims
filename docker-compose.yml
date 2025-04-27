@@ -9,6 +9,11 @@ services:
     # or move the docker-compose.yml
     env_file:
       - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PORT: ${DB_PORT}
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:

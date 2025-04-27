@@ -13,7 +13,7 @@ run: deps
 
 build: deps
 	@echo "🔨 Building binary..."
-	@go build -o $(MAIN) $(SRC)
+	@go build -o bin/$(MAIN) $(SRC)
 
 air: deps
 	@echo "♻️  Running with Air..."
@@ -31,7 +31,12 @@ clean:
 	@echo "🧹 Cleaning up..."
 	@rm -f $(MAIN)
 
-test:
+lint:
+	@echo "🔍 Running linters..."
+	@golangci-lint fmt ./...
+	@golangci-lint run ./...
+	
+test: deps
 	@echo "🧪 Running tests..."
 	@go test ./... -v
 	@echo "✅ All tests passed!"
