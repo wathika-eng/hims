@@ -8,6 +8,14 @@
 - Docker <https://docs.docker.com/desktop/>
 - Air (live reload) <https://github.com/air-verse/air>
 
+## Powerpoint presentation:
+
+## Database design:
+
+## API testing: 
+
+## Live API: 
+
 ### Setup local development
 
 1. Clone the repository
@@ -48,8 +56,14 @@
 6. With docker:
 
     ```bash
-    docker-compose up -d
+    COMPOSE_BAKE=true docker-compose up -d
     ```
+    <!-- or
+    ```bash
+    docker build -t hims .
+    docker run -p 8080:8080 hims
+    docker run --env-file .env -v $(pwd)/.env:/root/.env hims:latest
+    ``` -->
 
 #### Resources used
 

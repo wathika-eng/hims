@@ -4,9 +4,10 @@ package config
 import (
 	"fmt"
 	"log"
-	"os"
 
+	// autoload .env file if present
 	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 // struct with config variables
@@ -25,31 +26,43 @@ type Config struct {
 
 // load the env variables to the config struct
 // returns error and config
+// In Docker, environment variables are passed by the container runtime,
+// so your Go app does not need godotenv inside the container.
 func LoadConfigs() (*Config, error) {
-	if err := godotenv.Load(); err != nil {
-		return nil, fmt.Errorf("error initializing config: %v", err)
+	if err := godotenv.Load(".env.local"); err != nil {
+		log.Printf("error loading env variables: %v\n", err.Error())
 	}
+	viper.AutomaticEnv()
+
 	config := &Config{
-		DATABASE_URL: getEnv("DATABASE_URL"),
-		DB_TYPE:      getEnv("DB_TYPE"),
-		DB_NAME:      getEnv("DB_NAME"),
-		DB_USER:      getEnv("DB_USER"),
-		DB_PASSWORD:  getEnv("DB_PASSWORD"),
-		DB_HOST:      getEnv("DB_HOST"),
-		DB_PORT:      getEnv("DB_PORT"),
-		REDIS_URL:    getEnv("REDIS_URL"),
-		SECRET_KEY:   getEnv("SECRET_KEY"),
-		PORT:         getEnv("PORT"),
+		DATABASE_URL: viper.GetString("DATABASE_URL"),
+		DB_TYPE:      viper.GetString("DB_TYPE"),
+		DB_NAME:      viper.GetString("DB_NAME"),
+		DB_USER:      viper.GetString("DB_USER"),
+		DB_PASSWORD:  viper.GetString("DB_PASSWORD"),
+		DB_HOST:      viper.GetString("DB_HOST"), // Should be "db" in Docker Compose
+		DB_PORT:      viper.GetString("DB_PORT"),
+		REDIS_URL:    viper.GetString("REDIS_URL"),
+		SECRET_KEY:   viper.GetString("SECRET_KEY"),
+		PORT:         viper.GetString("PORT"),
 	}
-	// no error
+
+	// Validate critical DB fields
+	if config.DB_HOST == "" {
+		return nil, fmt.Errorf("DB_HOST is required")
+	}
+	if config.DB_USER == "" || config.DB_PASSWORD == "" || config.DB_NAME == "" {
+		return nil, fmt.Errorf("DB_USER, DB_PASSWORD, and DB_NAME are required")
+	}
+
 	return config, nil
 }
 
-// check if .env has the correct keys
-func getEnv(key string) string {
-	value, ok := os.LookupEnv(key)
-	if !ok || value == "" {
-		log.Printf("missing %v key in .env\n", key)
-	}
-	return value
-}
+// // check if .env has the correct keys
+// func viper.GetString(key string) string {
+// 	value, ok := os.LookupEnv(key)
+// 	if !ok || value == "" {
+// 		log.Printf("missing %v key in .env\n", key)
+// 	}
+// 	return value
+// }

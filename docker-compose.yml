@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:17-alpine
+    stop_signal: SIGINT
+    stop_grace_period: 30s
+    container_name: postgres_db
+    restart: always
+    # load a diffrent .env file for docker
+    # or move the docker-compose.yml
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${DB_USER} -d $${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: hims
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - mynetwork
+    # expose the app on port 8000
+    ports:
+      - "0.0.0.0:8000:8000"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  mynetwork:
+    driver: bridge

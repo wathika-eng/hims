@@ -19,6 +19,14 @@ air: deps
 	@echo "♻️  Running with Air..."
 	@air
 
+build-docker: 
+	@echo "🐳 Building Docker image..."
+	@COMPOSE_BAKE=true docker compose up --build
+
+run-docker: 
+	@echo "🐳 Building Docker image..."
+	@COMPOSE_BAKE=true docker compose up 
+
 clean:
 	@echo "🧹 Cleaning up..."
 	@rm -f $(MAIN)
