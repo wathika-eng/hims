@@ -13,6 +13,7 @@ import (
 	"syscall"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/swagger"
@@ -49,7 +50,7 @@ func NewServer() {
 	})
 	app.Use(logger.New())
 	app.Use(recover.New())
-	// app.Use(helmet.New())
+	app.Use(helmet.New())
 	app.Get("/swagger/*", swagger.HandlerDefault) // default
 	// app.Get("/swagger/*", swagger.New())
 

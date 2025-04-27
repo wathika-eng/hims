@@ -8,13 +8,13 @@
 - Docker <https://docs.docker.com/desktop/>
 - Air (live reload) <https://github.com/air-verse/air>
 
-## Powerpoint presentation: https://docs.google.com/presentation/d/13AXW5XdrwVaTFrY5SfnqQbtQ2RmhCLUZSyFV4tloCIc/edit?usp=sharing
+#### Powerpoint presentation: <https://docs.google.com/presentation/d/13AXW5XdrwVaTFrY5SfnqQbtQ2RmhCLUZSyFV4tloCIc/edit?usp=sharing>
 
-## Database design: drawSQL-image-export-2025-04-27.png
+#### Database design: <https://github.com/wathika-eng/hims/blob/main/drawSQL-image-export-2025-04-27.png>
 
-## API testing: 
+#### API testing: <https://www.postman.com/wathika/workspace/hims/collection/34083824-6c634517-02b7-4dfa-bbc0-fb585679cc2c?action=share&creator=34083824&active-environment=34083824-cb65b2c7-8738-47f7-8808-11bf34479d7c>
 
-## Live API: 
+#### Live API: <http://159.89.7.122:8000>
 
 ### Setup local development
 
@@ -25,7 +25,7 @@ Without Make and Docker, you can't run the application.
 
    ```bash
    git clone https://github.com/wathika-eng/hims --depth 1
-   # cd into the directory
+   # cd into the directory 
    cd hims
    ```
 
