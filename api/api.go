@@ -50,7 +50,10 @@ func NewServer() {
 	})
 	app.Use(logger.New())
 	app.Use(recover.New())
-	app.Use(helmet.New())
+	app.Use(helmet.New(helmet.Config{
+		XSSProtection:         "1",
+		ContentSecurityPolicy: "default-src 'self'; script-src 'self'; object-src 'none';",
+	}))
 	app.Get("/swagger/*", swagger.HandlerDefault) // default
 	// app.Get("/swagger/*", swagger.New())
 
