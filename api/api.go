@@ -11,20 +11,15 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/swagger"
 )
 
-// @title			Health Info Management System
-// @version		1.0
-// @description	Health Info Management System
-// @termsOfService	http://swagger.io/terms/
-// @contact.name	API Support
-// @contact.email	fiber@swagger.io
 func NewServer() {
 	// default logger
 	logg := slog.New(slog.NewJSONHandler(os.Stdout, nil))
@@ -54,8 +49,11 @@ func NewServer() {
 		XSSProtection:         "1",
 		ContentSecurityPolicy: "default-src 'self'; script-src 'self'; object-src 'none';",
 	}))
-	app.Get("/swagger/*", swagger.HandlerDefault) // default
-	// app.Get("/swagger/*", swagger.New())
+	app.Use(limiter.New(limiter.Config{
+		Max:               20,
+		Expiration:        30 * time.Second,
+		LimiterMiddleware: limiter.SlidingWindow{},
+	}))
 
 	routes.RegisterRoutes(app, cfg, db)
 

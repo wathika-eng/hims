@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"hims/pkg/models"
 	"log"
+	"time"
 )
 
 func (r *Repo) InsertNewPatient(p *models.Patient) error {
@@ -49,6 +50,8 @@ func (r *Repo) UpdatePatient(p *models.Patient, program *models.Program) (*model
 	if err != nil {
 		return nil, err
 	}
+
+	p.UpdatedAt.Time = time.Now()
 	resp, err := r.db.NewUpdate().Model(p).
 		WherePK().Exec(context.Background())
 	if err != nil {

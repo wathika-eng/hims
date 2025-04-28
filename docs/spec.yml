@@ -1,0 +1,533 @@
+openapi: 3.0.0
+info:
+  title: flows Mitmproxy2Swagger
+  version: 1.0.0
+servers:
+- url: http://159.89.7.122:8000
+  description: The default server
+paths:
+  /:
+    get:
+      summary: 'GET '
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      Idle:
+                        type: string
+                      InUse:
+                        type: string
+                      MaxIdleClosed:
+                        type: string
+                      MaxLifetimeClosed:
+                        type: string
+                      MaxOpenConnections:
+                        type: string
+                      OpenConnections:
+                        type: string
+                      WaitCount:
+                        type: string
+                      WaitDuration:
+                        type: string
+                  time:
+                    type: string
+              example:
+                data:
+                  Idle: '1'
+                  InUse: '0'
+                  MaxIdleClosed: '0'
+                  MaxLifetimeClosed: '0'
+                  MaxOpenConnections: '0'
+                  OpenConnections: '1'
+                  WaitCount: '0'
+                  WaitDuration: 0s
+                time: 2025-04-28 07:37:59.266621706 +0000 UTC m=+75970.557004118
+  /api/signup:
+    post:
+      summary: POST signup
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                  error:
+                    type: string
+              example:
+                data: doctor Breana.OHara@hotmail.com created successfully
+                error: 'false'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                licenseNumber:
+                  type: string
+                specialization:
+                  type: string
+            example:
+              firstName: Felix
+              lastName: Brekke
+              email: Breana.OHara@hotmail.com
+              password: oInNUch53cnhcuS
+              licenseNumber: 49:50:fc:ee:5c:96
+              specialization: Customer Web Facilitator
+  /api/login:
+    post:
+      summary: POST login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+              example:
+                accessToken: 
+                  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJkb2N0b3IiLCJleHAiOjE3NDU4Mjk0NzksImlhdCI6MTc0NTgyNTg3OSwiaXNzIjoiSElNUyBBUEkiLCJzdWIiOiJCcmVhbmEuT0hhcmFAaG90bWFpbC5jb20ifQ.AyyKL40NWt_TKBm6jPareAbw6r5BGUtlYZ2OemGX9T8
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+            example:
+              email: Breana.OHara@hotmail.com
+              password: oInNUch53cnhcuS
+  /api/add-patient:
+    post:
+      summary: POST add-patient
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                  error:
+                    type: string
+              example:
+                data: patient Maximus Batz successfully created
+                error: 'false'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                idNumber:
+                  type: string
+                phoneNumber:
+                  type: string
+                gender:
+                  type: string
+                Age:
+                  type: number
+            example:
+              firstName: Maximus
+              lastName: Batz
+              idNumber: '26890274'
+              phoneNumber: +254839-312-4191
+              gender: male
+              Age: 43
+  /api/patient:
+    get:
+      summary: GET patient
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      ID:
+                        type: number
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      idNumber:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      gender:
+                        type: string
+                      age:
+                        type: number
+                      role:
+                        type: string
+                      dateOfBirth:
+                        type: object
+                        nullable: true
+                      createdAt:
+                        type: string
+                      UpdatedAt:
+                        type: object
+                        nullable: true
+                      DeletedAt:
+                        type: object
+                        nullable: true
+                      patientPrograms:
+                        type: object
+                        nullable: true
+                  error:
+                    type: string
+              example:
+                data:
+                  ID: 5
+                  firstName: Maximus
+                  lastName: Batz
+                  idNumber: '26890274'
+                  phoneNumber: '2548393124191'
+                  gender: male
+                  age: 43
+                  role: patient
+                  dateOfBirth:
+                  createdAt: '2025-04-28T07:38:00.111567Z'
+                  UpdatedAt:
+                  DeletedAt:
+                  patientPrograms:
+                error: 'false'
+      parameters:
+      - name: id
+        in: query
+        required: false
+        schema:
+          type: number
+  /api/patients:
+    get:
+      summary: GET patients
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ID:
+                          type: number
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                        idNumber:
+                          type: string
+                        phoneNumber:
+                          type: string
+                        gender:
+                          type: string
+                        age:
+                          type: number
+                        role:
+                          type: string
+                        dateOfBirth:
+                          type: object
+                          nullable: true
+                        createdAt:
+                          type: string
+                        UpdatedAt:
+                          type: object
+                          nullable: true
+                        DeletedAt:
+                          type: object
+                          nullable: true
+                        patientPrograms:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              ID:
+                                type: number
+                              program:
+                                type: string
+                              programCode:
+                                type: number
+                  error:
+                    type: string
+              example:
+                data:
+                - ID: 1
+                  firstName: Donato
+                  lastName: Smitham
+                  idNumber: '18830031'
+                  phoneNumber: '2546877843654'
+                  gender: male
+                  age: 43
+                  role: patient
+                  dateOfBirth:
+                  createdAt: '2025-04-27T10:13:06.430068Z'
+                  UpdatedAt:
+                  DeletedAt:
+                  patientPrograms:
+                  - ID: 1
+                    program: Incredible Rubber Keyboard
+                    programCode: 184
+                - ID: 2
+                  firstName: Edyth
+                  lastName: Gottlieb
+                  idNumber: '80611019'
+                  phoneNumber: '2543119198606'
+                  gender: male
+                  age: 43
+                  role: patient
+                  dateOfBirth:
+                  createdAt: '2025-04-27T10:32:40.941975Z'
+                  UpdatedAt:
+                  DeletedAt:
+                  patientPrograms:
+                  - ID: 2
+                    program: Ergonomic Soft Tuna
+                    programCode: 673
+                - ID: 3
+                  firstName: Louie
+                  lastName: Gislason
+                  idNumber: '37453019'
+                  phoneNumber: '2544317584000'
+                  gender: male
+                  age: 43
+                  role: patient
+                  dateOfBirth:
+                  createdAt: '2025-04-27T10:39:20.332009Z'
+                  UpdatedAt:
+                  DeletedAt:
+                  patientPrograms:
+                  - ID: 3
+                    program: Fantastic Granite Ball
+                    programCode: 515
+                - ID: 4
+                  firstName: Theodore
+                  lastName: Leuschke
+                  idNumber: '98601222'
+                  phoneNumber: '2543192133169'
+                  gender: male
+                  age: 43
+                  role: patient
+                  dateOfBirth:
+                  createdAt: '2025-04-27T10:39:49.290939Z'
+                  UpdatedAt:
+                  DeletedAt:
+                  patientPrograms:
+                  - ID: 4
+                    program: Generic Frozen Ball
+                    programCode: 174
+                - ID: 5
+                  firstName: Maximus
+                  lastName: Batz
+                  idNumber: '26890274'
+                  phoneNumber: '2548393124191'
+                  gender: male
+                  age: 43
+                  role: patient
+                  dateOfBirth:
+                  createdAt: '2025-04-28T07:38:00.111567Z'
+                  UpdatedAt:
+                  DeletedAt:
+                  patientPrograms:
+                error: 'false'
+  /api/add-program:
+    post:
+      summary: POST add-program
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                  error:
+                    type: string
+              example:
+                data: added Gorgeous Granite Car program
+                error: 'false'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                program:
+                  type: string
+                programCode:
+                  type: number
+            example:
+              program: Gorgeous Granite Car
+              programCode: 390
+  /api/programs:
+    get:
+      summary: GET programs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ID:
+                          type: number
+                        program:
+                          type: string
+                        programCode:
+                          type: number
+                  error:
+                    type: string
+              example:
+                data:
+                - ID: 1
+                  program: Incredible Rubber Keyboard
+                  programCode: 184
+                - ID: 2
+                  program: Ergonomic Soft Tuna
+                  programCode: 673
+                - ID: 3
+                  program: Fantastic Granite Ball
+                  programCode: 515
+                - ID: 4
+                  program: Generic Frozen Ball
+                  programCode: 174
+                - ID: 5
+                  program: Gorgeous Granite Car
+                  programCode: 390
+                error: 'false'
+  /api/enroll:
+    post:
+      summary: POST enroll
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      ID:
+                        type: number
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      idNumber:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      gender:
+                        type: string
+                      age:
+                        type: number
+                      role:
+                        type: string
+                      dateOfBirth:
+                        type: object
+                        nullable: true
+                      createdAt:
+                        type: string
+                      UpdatedAt:
+                        type: object
+                        nullable: true
+                      DeletedAt:
+                        type: object
+                        nullable: true
+                      patientPrograms:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            ID:
+                              type: number
+                            program:
+                              type: string
+                            programCode:
+                              type: number
+                  error:
+                    type: string
+              example:
+                data:
+                  ID: 5
+                  firstName: Maximus
+                  lastName: Batz
+                  idNumber: '26890274'
+                  phoneNumber: '2548393124191'
+                  gender: male
+                  age: 43
+                  role: patient
+                  dateOfBirth:
+                  createdAt: '2025-04-28T07:38:00.111567Z'
+                  UpdatedAt:
+                  DeletedAt:
+                  patientPrograms:
+                  - ID: 5
+                    program: Gorgeous Granite Car
+                    programCode: 390
+                error: 'false'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                programName:
+                  type: string
+                patientID:
+                  type: string
+            example:
+              programName: Gorgeous Granite Car
+              patientID: '26890274'
+x-path-templates:
+  # Remove the ignore: prefix to generate an endpoint with its URL
+  # Lines that are closer to the top take precedence, the matching is greedy
+  []
