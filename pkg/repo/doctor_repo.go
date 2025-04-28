@@ -18,8 +18,7 @@ func (r *Repo) InsertNewDoctor(d *models.Doctor) error {
 func (r *Repo) LookupDoctor(email, specialization string) (models.Doctor, error) {
 	var doctor models.Doctor
 	err := r.db.NewSelect().
-		Model(&doctor).WhereOr("email = ?", email).
-		WhereOr("specialization = ?", specialization).Limit(1).
+		Model(&doctor).Where("email = ?", email).Limit(1).
 		Scan(context.Background())
 	if err != nil {
 		return models.Doctor{}, fmt.Errorf("no doctor found with email: %v", email)

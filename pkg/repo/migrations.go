@@ -9,6 +9,7 @@ import (
 
 func (r *Repo) Up() error {
 	ctx := context.Background()
+
 	r.db.RegisterModel((*models.PatientProgram)(nil))
 	modelsToMigrate := []any{
 		(*models.Doctor)(nil),
@@ -33,6 +34,7 @@ func (r *Repo) Up() error {
 func (r *Repo) Reset() error {
 	ctx := context.Background()
 
+	r.db.RegisterModel((*models.PatientProgram)(nil))
 	modelsToReset := []any{
 		(*models.Doctor)(nil),
 		(*models.Patient)(nil),
