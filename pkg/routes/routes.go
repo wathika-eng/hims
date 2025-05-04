@@ -38,12 +38,10 @@ func RegisterRoutes(r fiber.Router, cfg *config.Config, db *bun.DB) {
 
 	protected.Post("/programs", handler.AddProgram)
 	protected.Get("/programs", handler.GetPrograms)
+	protected.Get("/programs/pdf", handler.GeneratePDF)
 
 	protected.Post("/patients", handler.NewPatient)
 	protected.Get("/patients", handler.GetPatients)
 	protected.Get("/patients/:id<[0-9]+>", handler.Profile)
 	protected.Post("patients/enroll", handler.AddPatientProgram)
-
-	// doc.Get("/profile?email", handler.Profile)
-
 }

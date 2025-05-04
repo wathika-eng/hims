@@ -44,9 +44,10 @@ type Patient struct {
 // a patient can have many programs
 type Program struct {
 	bun.BaseModel
-	ID   int    `bun:"id,pk,autoincrement"`
-	Name string `json:"program" validate:"required,min=3" bun:",unique,notnull"`
-	Code uint   `json:"programCode" validate:"required,lte=9999" bun:",unique,notnull"`
+	ID       int        `bun:"id,pk,autoincrement"`
+	Name     string     `json:"program" validate:"required,min=3" bun:",unique,notnull"`
+	Code     uint       `json:"programCode" validate:"required,lte=9999" bun:",unique,notnull"`
+	Patients []*Patient `json:"patientsEnrolled" bun:"m2m:patient_programs,join:Program=Patient"`
 	// PatientID int
 	// to later track doctor who created it
 	// DoctorID  int

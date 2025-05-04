@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"hims/pkg/models"
+	"hims/pkg/repo"
 	"log"
 	"testing"
 	"time"
@@ -47,7 +48,7 @@ func TestCustomerRepo(t *testing.T) {
 
 	sqldb := stdlib.OpenDB(*config)
 	db := bun.NewDB(sqldb, pgdialect.New())
-	repo := NewRepo(db)
+	repo := repo.NewRepo(db)
 	repo.Up()
 	// Insert a new patient
 	err = repo.InsertNewPatient(&models.Patient{

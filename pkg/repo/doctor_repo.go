@@ -44,7 +44,7 @@ func (r *Repo) FetchPrograms() ([]models.Program, error) {
 	var programs []models.Program
 
 	err := r.db.NewSelect().Model(&programs).Order("id ASC").
-		Scan(context.Background())
+		Relation("Patients").Scan(context.Background())
 	if err != nil {
 		return []models.Program{}, err
 	}

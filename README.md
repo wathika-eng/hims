@@ -80,4 +80,6 @@ Without Make and Docker, you can't run the application.
 
 ##### Tests
 
-![postman-tests](docs/image.png)
+![postman-tests](docs/postmanTests.png)
+
+![PdfGen](docs/pdfGen.png)
