@@ -77,3 +77,7 @@ Without Make and Docker, you can't run the application.
 <https://12factor.net/>
 <https://bun.uptrace.dev/guide/golang-orm.html>
 <https://testcontainers.com/guides/getting-started-with-testcontainers-for-go/>
+
+##### Tests
+
+![postman-tests](docs/image.png)

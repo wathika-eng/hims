@@ -2,14 +2,20 @@ package repo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"hims/pkg/models"
 	"log"
+
+	"github.com/uptrace/bun/driver/pgdriver"
 )
 
 func (r *Repo) InsertNewDoctor(d *models.Doctor) error {
 	_, err := r.db.NewInsert().Model(d).Exec(context.Background())
 	if err != nil {
+		if err, ok := err.(pgdriver.Error); ok && err.IntegrityViolation() {
+			return errors.New("doctor with this license number or email already exists")
+		}
 		return err
 	}
 	return nil

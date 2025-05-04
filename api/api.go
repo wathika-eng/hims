@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -43,17 +44,31 @@ func NewServer() {
 	app := fiber.New(fiber.Config{
 		AppName: "HISM V1.0.0",
 	})
+
 	app.Use(logger.New())
 	app.Use(recover.New())
 	app.Use(helmet.New(helmet.Config{
 		XSSProtection:         "1",
-		ContentSecurityPolicy: "default-src 'self'; script-src 'self'; object-src 'none';",
+		ContentSecurityPolicy: "",
 	}))
 	app.Use(limiter.New(limiter.Config{
 		Max:               20,
 		Expiration:        30 * time.Second,
 		LimiterMiddleware: limiter.SlidingWindow{},
 	}))
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:5173/",
+		AllowHeaders: "Origin, Content-Type, Accept",
+	}))
+
+	app.Static("/", "./frontend/dist", fiber.Static{
+		//Compress:      true,
+		ByteRange:     true,
+		Browse:        true,
+		Index:         "index.html",
+		CacheDuration: 10 * time.Second,
+		MaxAge:        3600,
+	})
 
 	routes.RegisterRoutes(app, cfg, db)
 

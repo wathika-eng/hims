@@ -1,32 +1,42 @@
 package handlers
 
 import (
-	"strings"
+	"hims/pkg/models"
 
 	"github.com/gofiber/fiber/v2"
 )
 
+// api/v1/protected/patients/123
 func (h *Handler) Profile(ctx *fiber.Ctx) error {
-	phoneNum := ctx.Query("phone", "")
-	id := ctx.Query("id", "")
-	if strings.TrimSpace(phoneNum) == "" && strings.TrimSpace(id) == "" {
-		return ctx.Status(fiber.StatusBadRequest).JSON(
-			fiber.Map{
-				"error": "true",
-				"data":  "invalid query param",
-			},
-		)
+	param := struct {
+		ID    string `params:"id" validate:"max=10"`
+		Phone string `params:"phone" validate:"max=10"`
+	}{}
+
+	if err := ctx.ParamsParser(&param); err != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": true,
+			"data":  "invalid param, either phone number or id is needed",
+		})
 	}
-	patient, err := h.repo.LookupPatient(phoneNum, id)
+
+	if err := h.services.Validate(&param); err != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": true,
+			"data":  err,
+		})
+	}
+
+	patient, err := h.repo.LookupPatient(param.Phone, param.ID)
 	if err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": "true",
+			"error": true,
 			"data":  err.Error(),
 		})
 	}
 
 	return ctx.JSON(fiber.Map{
-		"error": "false",
+		"error": false,
 		"data":  patient,
 	})
 }
@@ -42,43 +52,45 @@ func (h *Handler) AddPatientProgram(ctx *fiber.Ctx) error {
 	var reqBody req
 	if err := ctx.BodyParser(&reqBody); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
-			"error": "true",
+			"error": true,
 			"data":  err.Error(),
 		})
 	}
 	if err := h.services.Validate(reqBody); err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": "true",
+			"error": true,
 			"data":  err,
 		})
 	}
 	program, err := h.repo.LookupProgram(reqBody.Program, 0)
-	if err != nil {
+	if err != nil || program.Name == "" {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": "true",
+			"error": true,
 			"data":  err.Error(),
 		})
 	}
 
 	patient, err := h.repo.LookupPatient("", reqBody.Patient)
-	if err != nil {
+	if err != nil || patient.IDNumber == "" {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": "true",
+			"error": true,
 			"data":  err.Error(),
 		})
 	}
 
 	updatedPatient, err := h.services.ModPatient(&patient, &program)
-	if err != nil {
+	if err != nil || patient.IDNumber == "" {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": "true",
+			"error": true,
 			"data":  err.Error(),
 		})
 	}
 
-	return ctx.JSON(fiber.Map{
-		"error": "false",
+	return ctx.Status(201).JSON(fiber.Map{
+		"error": false,
 		"data":  updatedPatient,
+		//fmt.Sprintf("patient with ID: %v added to program: %v",
+		//	updatedPatient.ID, updatedPatient.Programs),
 	})
 }
 
@@ -86,12 +98,18 @@ func (h *Handler) GetPrograms(ctx *fiber.Ctx) error {
 	programs, err := h.repo.FetchPrograms()
 	if err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": "true",
+			"error": true,
 			"data":  err.Error(),
 		})
 	}
+	if len(programs) == 0 {
+		return ctx.Status(204).JSON(fiber.Map{
+			"error": false,
+			"data":  []models.Patient{},
+		})
+	}
 	return ctx.JSON(fiber.Map{
-		"error": "false",
+		"error": false,
 		"data":  programs,
 	})
 }
@@ -100,12 +118,18 @@ func (h *Handler) GetPatients(ctx *fiber.Ctx) error {
 	patients, err := h.repo.FetchPatients()
 	if err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"error": "true",
+			"error": true,
 			"data":  err.Error(),
 		})
 	}
+	if len(patients) == 0 {
+		return ctx.Status(204).JSON(fiber.Map{
+			"error": false,
+			"data":  []models.Program{},
+		})
+	}
 	return ctx.JSON(fiber.Map{
-		"error": "false",
+		"error": false,
 		"data":  patients,
 	})
 }

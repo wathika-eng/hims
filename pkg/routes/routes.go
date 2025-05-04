@@ -14,6 +14,8 @@ import (
 func RegisterRoutes(r fiber.Router, cfg *config.Config, db *bun.DB) {
 	repo := repo.NewRepo(db)
 	// create tables panics if err, so as to stop app
+	// panic will be useful to run deferred functions while exiting
+
 	err := repo.Up()
 	if err != nil {
 		panic(err)
@@ -26,19 +28,22 @@ func RegisterRoutes(r fiber.Router, cfg *config.Config, db *bun.DB) {
 	services := services.NewServices(repo, cfg)
 	handler := handlers.NewHandler(repo, services)
 
-	r.Get("/", handler.TestAPI)
-	r.Post("api/signup", handler.NewDoctor)
-	r.Post("api/login", handler.LoginDoctor)
+	api := r.Group("/api/v1")
+	api.Get("/health", handler.TestAPI)
+	api.Post("/auth/signup", handler.NewDoctor)
+	api.Post("/auth/login", handler.LoginDoctor)
 
-	doc := r.Group("/api/")
-	doc.Use(middlewares.Auth)
-	{
-		doc.Post("/add-program", handler.AddProgram)
-		doc.Post("/add-patient", handler.NewPatient)
-		doc.Post("/enroll", handler.AddPatientProgram)
-		doc.Get("/patient", handler.Profile)
-		doc.Get("/programs", handler.GetPrograms)
-		doc.Get("/patients", handler.GetPatients)
-		// doc.Get("/profile?email", handler.Profile)
-	}
+	protected := api.Group("/protected")
+	protected.Use(middlewares.Auth)
+
+	protected.Post("/programs", handler.AddProgram)
+	protected.Get("/programs", handler.GetPrograms)
+
+	protected.Post("/patients", handler.NewPatient)
+	protected.Get("/patients", handler.GetPatients)
+	protected.Get("/patients/:id<[0-9]+>", handler.Profile)
+	protected.Post("patients/enroll", handler.AddPatientProgram)
+
+	// doc.Get("/profile?email", handler.Profile)
+
 }

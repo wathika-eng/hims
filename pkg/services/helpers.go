@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -23,7 +22,6 @@ func (s *Service) generateToken(email, role string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error generating access token: %v", err)
 	}
-	log.Println(signedToken)
 	return signedToken, nil
 }
 

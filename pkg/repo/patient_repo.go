@@ -3,15 +3,19 @@ package repo
 import (
 	"context"
 	"errors"
-	"fmt"
 	"hims/pkg/models"
 	"log"
 	"time"
+
+	"github.com/uptrace/bun/driver/pgdriver"
 )
 
 func (r *Repo) InsertNewPatient(p *models.Patient) error {
 	_, err := r.db.NewInsert().Model(p).Exec(context.Background())
 	if err != nil {
+		if err, ok := err.(pgdriver.Error); ok && err.IntegrityViolation() {
+			return errors.New("patient with this id number or email already exists")
+		}
 		return err
 	}
 	return nil
@@ -23,7 +27,6 @@ func (r *Repo) FetchPatients() ([]models.Patient, error) {
 	err := r.db.NewSelect().Model(&patients).Relation("Programs").
 		Scan(context.Background())
 	if err != nil {
-		log.Println("Error executing query:", err)
 		return []models.Patient{}, err
 	}
 
@@ -38,8 +41,8 @@ func (r *Repo) LookupPatient(phoneNum, idNum string) (models.Patient, error) {
 		WhereOr("id_number = ?", idNum).WhereOr("phone_number = ?", phoneNum)
 	err := q.Limit(1).Scan(context.Background())
 	if err != nil {
-		log.Println(err.Error())
-		return models.Patient{}, fmt.Errorf("failed to find patient: %w", err)
+		return models.Patient{},
+			errors.New("patient not found, try again with either id or phone number")
 	}
 
 	return patient, nil
@@ -47,20 +50,20 @@ func (r *Repo) LookupPatient(phoneNum, idNum string) (models.Patient, error) {
 
 func (r *Repo) UpdatePatient(p *models.Patient, program *models.Program) (*models.Patient, error) {
 	_, err := r.LookupPatient(p.PhoneNumber, p.IDNumber)
+
 	if err != nil {
 		return nil, err
 	}
 
 	p.UpdatedAt.Time = time.Now()
-	resp, err := r.db.NewUpdate().Model(p).
+	_, err = r.db.NewUpdate().Model(p).
 		WherePK().Exec(context.Background())
+
 	if err != nil {
-		return nil, err
+		log.Println(err.Error())
+		return nil, errors.New("error while updating patient")
 	}
-	rowsAffected, _ := resp.RowsAffected()
-	if rowsAffected == 0 {
-		return nil, errors.New("update not done")
-	}
+
 	patientProgram := models.PatientProgram{
 		PatientID: p.ID,
 		Patient:   p,
@@ -69,7 +72,7 @@ func (r *Repo) UpdatePatient(p *models.Patient, program *models.Program) (*model
 	}
 	_, err = r.db.NewInsert().Model(&patientProgram).Exec(context.Background())
 	if err != nil {
-		return nil, err
+		return nil, errors.New("error while inserting new program data to patient, duplicate")
 	}
 	return p, nil
 }
