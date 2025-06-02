@@ -29,7 +29,7 @@ type Config struct {
 // In Docker, environment variables are passed by the container runtime,
 // so your Go app does not need godotenv inside the container.
 func LoadConfigs() (*Config, error) {
-	if err := godotenv.Load(".env.local"); err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		log.Printf("error loading env variables: %v\n", err.Error())
 	}
 	viper.AutomaticEnv()
