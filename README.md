@@ -42,6 +42,7 @@ Without Make and Docker, you can't run the application.
    ```bash
     cp .env.example .env
     cp .env.example .env.local
+    # edit the .env with your credentials
     ```
 
 4. Create a PostgreSQL database
@@ -54,8 +55,48 @@ Without Make and Docker, you can't run the application.
 5. Run the application with live reload
 
     ```bash
+    # go install github.com/air-verse/air@latest
     air
     ```
+Then test the endpoint:
+```bash
+curl localhost:8000/api/v1/health
+
+HTTP/1.1 200 OK
+Date: Mon, 02 Jun 2025 07:27:43 GMT
+Content-Type: application/json
+Content-Length: 226
+X-Xss-Protection: 1
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+Cross-Origin-Embedder-Policy: require-corp
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+X-Dns-Prefetch-Control: off
+X-Download-Options: noopen
+X-Permitted-Cross-Domain-Policies: none
+Vary: Origin
+X-Ratelimit-Limit: 20
+X-Ratelimit-Remaining: 1
+X-Ratelimit-Reset: 1
+
+{
+    "data": {
+        "Idle": "1",
+        "InUse": "0",
+        "MaxIdleClosed": "0",
+        "MaxLifetimeClosed": "0",
+        "MaxOpenConnections": "0",
+        "OpenConnections": "1",
+        "WaitCount": "0",
+        "WaitDuration": "0s"
+    },
+    "time": "2025-06-02 10:27:43.829031032 +0300 EAT m=+135.523468725"
+}
+
+```
 
 6. With docker:
 
@@ -75,7 +116,9 @@ Without Make and Docker, you can't run the application.
 #### Resources used
 
 <https://12factor.net/>
+
 <https://bun.uptrace.dev/guide/golang-orm.html>
+
 <https://testcontainers.com/guides/getting-started-with-testcontainers-for-go/>
 
 ##### Tests
