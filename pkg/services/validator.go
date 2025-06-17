@@ -9,10 +9,6 @@ type (
 		Value       string `json:"value,omitempty"`
 	}
 
-	XValidator struct {
-		validator *validator.Validate
-	}
-
 	GlobalErrorHandlerResp struct {
 		Success bool   `json:"success"`
 		Message string `json:"message"`

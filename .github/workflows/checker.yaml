@@ -1,0 +1,45 @@
+name: Go
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Install go-mod-upgrade
+        run: go install github.com/oligot/go-mod-upgrade@latest
+
+      - name: Lint
+        run: $(go env GOPATH)/bin/golangci-lint run ./...
+
+      - name: Staticcheck
+        run: $(go env GOPATH)/bin/staticcheck ./...
+
+      - name: Check module updates
+        run: $(go env GOPATH)/bin/go-mod-upgrade
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v ./...
