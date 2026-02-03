@@ -6,7 +6,7 @@ import (
 	"hims/pkg/services"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 type Handler struct {
@@ -21,7 +21,7 @@ func NewHandler(repo *repo.Repo, service *services.Service) *Handler {
 	}
 }
 
-func (h *Handler) TestAPI(ctx *fiber.Ctx) error {
+func (h *Handler) TestAPI(ctx fiber.Ctx) error {
 	return ctx.JSON(fiber.Map{
 		"time": time.Now().String(),
 		"data": h.repo.Stats(),

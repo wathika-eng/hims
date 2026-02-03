@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"hims/pkg/models"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 // endpoint to handle patient creation
-func (h *Handler) NewPatient(ctx *fiber.Ctx) error {
+func (h *Handler) NewPatient(ctx fiber.Ctx) error {
 	var reqBody models.Patient
-	if err := ctx.BodyParser(&reqBody); err != nil {
+	if err := ctx.Bind().Body(&reqBody); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 	if err := h.services.Validate(reqBody); err != nil {
@@ -32,13 +32,13 @@ func (h *Handler) NewPatient(ctx *fiber.Ctx) error {
 }
 
 // api/v1/protected/patients/123
-func (h *Handler) Profile(ctx *fiber.Ctx) error {
+func (h *Handler) Profile(ctx fiber.Ctx) error {
 	param := struct {
 		ID    string `params:"id" validate:"max=10"`
 		Phone string `params:"phone" validate:"max=10"`
 	}{}
 
-	if err := ctx.ParamsParser(&param); err != nil {
+	if err := ctx.Bind().URI(&param); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
 			"error": true,
 			"data":  "invalid param, either phone number or id is needed",
@@ -67,7 +67,7 @@ func (h *Handler) Profile(ctx *fiber.Ctx) error {
 }
 
 // get all patients from the db
-func (h *Handler) GetPatients(ctx *fiber.Ctx) error {
+func (h *Handler) GetPatients(ctx fiber.Ctx) error {
 	patients, err := h.repo.FetchPatients()
 	if err != nil {
 		return ctx.Status(500).JSON(fiber.Map{

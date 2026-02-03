@@ -6,13 +6,13 @@ import (
 	"hims/pkg/models"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/phpdave11/gofpdf"
 )
 
-func (h *Handler) AddProgram(ctx *fiber.Ctx) error {
+func (h *Handler) AddProgram(ctx fiber.Ctx) error {
 	var reqBody models.Program
-	if err := ctx.BodyParser(&reqBody); err != nil {
+	if err := ctx.Bind().Body(&reqBody); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
 			"error": true,
 			"data":  err.Error(),
@@ -36,7 +36,7 @@ func (h *Handler) AddProgram(ctx *fiber.Ctx) error {
 	})
 }
 
-func (h *Handler) AddPatientProgram(ctx *fiber.Ctx) error {
+func (h *Handler) AddPatientProgram(ctx fiber.Ctx) error {
 	// if err := h.verifyDoc(ctx); err != nil {
 	// 	return err
 	// }
@@ -45,7 +45,7 @@ func (h *Handler) AddPatientProgram(ctx *fiber.Ctx) error {
 		Patient string `json:"patientID" validate:"required"`
 	}
 	var reqBody req
-	if err := ctx.BodyParser(&reqBody); err != nil {
+	if err := ctx.Bind().Body(&reqBody); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
 			"error": true,
 			"data":  err.Error(),
@@ -89,7 +89,7 @@ func (h *Handler) AddPatientProgram(ctx *fiber.Ctx) error {
 	})
 }
 
-func (h *Handler) GetPrograms(ctx *fiber.Ctx) error {
+func (h *Handler) GetPrograms(ctx fiber.Ctx) error {
 	programs, err := h.repo.FetchPrograms()
 	if err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
@@ -111,7 +111,7 @@ func (h *Handler) GetPrograms(ctx *fiber.Ctx) error {
 }
 
 // returns a pdf of programs and patients enrolled in each
-func (h *Handler) GeneratePDF(ctx *fiber.Ctx) error {
+func (h *Handler) GeneratePDF(ctx fiber.Ctx) error {
 	programs, err := h.repo.FetchPrograms()
 	if err != nil {
 		return ctx.Status(500).SendString("Failed to fetch programs")

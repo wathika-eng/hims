@@ -13,12 +13,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/helmet"
-	"github.com/gofiber/fiber/v2/middleware/limiter"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v3/middleware/static"
+
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/cors"
+	"github.com/gofiber/fiber/v3/middleware/helmet"
+	"github.com/gofiber/fiber/v3/middleware/limiter"
+	"github.com/gofiber/fiber/v3/middleware/logger"
+	"github.com/gofiber/fiber/v3/middleware/recover"
 )
 
 func NewServer() {
@@ -41,9 +43,7 @@ func NewServer() {
 	defer db.Close()
 
 	// initialize a new fiber app instance
-	app := fiber.New(fiber.Config{
-		AppName: "HISM V1.0.0",
-	})
+	app := fiber.New(fiber.Config{AppName: "HISM V1.0.0"})
 
 	app.Use(logger.New())
 	app.Use(recover.New())
@@ -57,18 +57,18 @@ func NewServer() {
 		LimiterMiddleware: limiter.SlidingWindow{},
 	}))
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:5173/",
-		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowOrigins: []string{"http://localhost:5173/"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept"},
 	}))
 
-	app.Static("/", "./frontend/dist", fiber.Static{
+	app.Get("/*", static.New("./frontend/dist", static.Config{
 		//Compress:      true,
 		ByteRange:     true,
 		Browse:        true,
-		Index:         "index.html",
+		IndexNames:    []string{"index.html"},
 		CacheDuration: 10 * time.Second,
 		MaxAge:        3600,
-	})
+	}))
 
 	routes.RegisterRoutes(app, cfg, db)
 

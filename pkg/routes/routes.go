@@ -7,7 +7,7 @@ import (
 	"hims/pkg/repo"
 	"hims/pkg/services"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/uptrace/bun"
 )
 
