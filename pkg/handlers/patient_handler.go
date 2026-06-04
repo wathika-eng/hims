@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"hims/pkg/models"
+	"strconv"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -31,30 +32,20 @@ func (h *Handler) NewPatient(ctx fiber.Ctx) error {
 	})
 }
 
-// api/v1/protected/patients/123
+// /api/v1/protected/patients/:id
 func (h *Handler) Profile(ctx fiber.Ctx) error {
-	param := struct {
-		ID    string `params:"id" validate:"max=10"`
-		Phone string `params:"phone" validate:"max=10"`
-	}{}
-
-	if err := ctx.Bind().URI(&param); err != nil {
-		return ctx.Status(400).JSON(fiber.Map{
-			"error": true,
-			"data":  "invalid param, either phone number or id is needed",
-		})
-	}
-
-	if err := h.services.Validate(&param); err != nil {
-		return ctx.Status(400).JSON(fiber.Map{
-			"error": true,
-			"data":  err,
-		})
-	}
-
-	patient, err := h.repo.LookupPatient(param.Phone, param.ID)
+	rawID := ctx.Params("id")
+	id, err := strconv.Atoi(rawID)
 	if err != nil {
-		return ctx.Status(500).JSON(fiber.Map{
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": true,
+			"data":  "invalid patient id",
+		})
+	}
+
+	patient, err := h.repo.GetPatientByID(id)
+	if err != nil {
+		return ctx.Status(404).JSON(fiber.Map{
 			"error": true,
 			"data":  err.Error(),
 		})

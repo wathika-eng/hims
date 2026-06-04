@@ -110,6 +110,20 @@ func (h *Handler) GetPrograms(ctx fiber.Ctx) error {
 	})
 }
 
+func maskID(id string) string {
+	if len(id) < 5 {
+		return id
+	}
+	return id[:2] + "****" + id[len(id)-2:]
+}
+
+func maskPhone(phone string) string {
+	if len(phone) < 7 {
+		return phone
+	}
+	return phone[:3] + "****" + phone[len(phone)-3:]
+}
+
 // returns a pdf of programs and patients enrolled in each
 func (h *Handler) GeneratePDF(ctx fiber.Ctx) error {
 	programs, err := h.repo.FetchPrograms()
@@ -154,9 +168,9 @@ func (h *Handler) GeneratePDF(ctx fiber.Ctx) error {
 		pdf.SetFont("Arial", "", 11)
 		for _, patient := range prog.Patients {
 			fullName := patient.FirstName + " " + patient.LastName
-			pdf.CellFormat(30, 7, patient.IDNumber, "1", 0, "", false, 0, "")
+			pdf.CellFormat(30, 7, maskID(patient.IDNumber), "1", 0, "", false, 0, "")
 			pdf.CellFormat(40, 7, fullName, "1", 0, "", false, 0, "")
-			pdf.CellFormat(30, 7, patient.PhoneNumber, "1", 0, "", false, 0, "")
+			pdf.CellFormat(30, 7, maskPhone(patient.PhoneNumber), "1", 0, "", false, 0, "")
 			pdf.CellFormat(20, 7, patient.Gender, "1", 0, "", false, 0, "")
 			pdf.CellFormat(20, 7, strconv.Itoa(int(patient.Age)), "1", 1, "", false, 0, "")
 		}

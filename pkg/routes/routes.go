@@ -20,10 +20,10 @@ func RegisterRoutes(r fiber.Router, cfg *config.Config, db *bun.DB) {
 	if err != nil {
 		panic(err)
 	}
-	// err := repo.Reset()
-	// if err != nil {
-	// 	panic(err)
-	// }
+
+	if err := repo.Seed(); err != nil {
+		panic(err)
+	}
 
 	services := services.NewServices(repo, cfg)
 	handler := handlers.NewHandler(repo, services)
