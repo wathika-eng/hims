@@ -57,7 +57,7 @@ func NewServer() {
 		LimiterMiddleware: limiter.SlidingWindow{},
 	}))
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:5173/"},
+		AllowOrigins: []string{"http://localhost:5173/", "https://hmis-three.vercel.app/"},
 		AllowHeaders: []string{"Origin", "Content-Type", "Accept"},
 	}))
 
@@ -71,6 +71,9 @@ func NewServer() {
 	}))
 
 	routes.RegisterRoutes(app, cfg, db)
+	if cfg.PORT == "" {
+		cfg.PORT = "8000"
+	}
 
 	if err := app.Listen(fmt.Sprintf(":%v", cfg.PORT)); err != nil {
 		log.Fatalf("error while starting the server: %v", err)

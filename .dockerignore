@@ -25,6 +25,6 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# Ignore environment variables
-# .env
-# .env.*
+frontend/
+node_modules/
+.git

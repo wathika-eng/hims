@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'https://hims-506915313256.africa-south1.run.app',
         changeOrigin: true,
       },
     },
