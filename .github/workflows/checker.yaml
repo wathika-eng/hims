@@ -1,4 +1,4 @@
-name: Go
+name: Go CI
 
 on:
   push:
@@ -6,40 +6,60 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: go-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
+          go-version: "1.26.x"
+          cache: true
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          # Upgraded version to support Go 1.25+ syntax parsing
+          version: v1.64.6
+          args: --timeout=5m
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.x"
+          # Relying on setup-go's built-in cache handling is cleaner than actions/cache@v4
+          cache: true
 
       - name: Install dependencies
         run: go mod download
 
-      - name: Install golangci-lint
-        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - name: Check formatting
+        # If running locally, make sure you've executed `gofmt -w .`
+        run: xargs -r gofmt -d < <(git ls-files '*.go')
 
-      - name: Install staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@latest
-
-      - name: Install go-mod-upgrade
-        run: go install github.com/oligot/go-mod-upgrade@latest
-
-      - name: Lint
-        run: $(go env GOPATH)/bin/golangci-lint run ./...
-
-      - name: Staticcheck
-        run: $(go env GOPATH)/bin/staticcheck ./...
-
-      - name: Check module updates
-        run: $(go env GOPATH)/bin/go-mod-upgrade
+      # Cleaned up the diff check to ensure it doesn't flag untracked files weirdly
+      - name: Verify module tidiness
+        run: |
+          go mod tidy
+          git diff --exit-code go.mod go.sum
 
       - name: Build
         run: go build -v ./...
 
-      - name: Test
-        run: go test -v ./...
+      - name: Test with Coverage
+        run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.out

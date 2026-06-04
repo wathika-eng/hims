@@ -58,7 +58,9 @@ Without Make and Docker, you can't run the application.
     # go install github.com/air-verse/air@latest
     air
     ```
+
 Then test the endpoint:
+
 ```bash
 curl localhost:8000/api/v1/health
 
@@ -98,7 +100,7 @@ X-Ratelimit-Reset: 1
 
 ```
 
-6. With docker:
+1. With docker:
 
     ```bash
     COMPOSE_BAKE=true docker-compose up -d
@@ -120,6 +122,8 @@ X-Ratelimit-Reset: 1
 <https://bun.uptrace.dev/guide/golang-orm.html>
 
 <https://testcontainers.com/guides/getting-started-with-testcontainers-for-go/>
+
+<https://docs.cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-go-service#cloud-shell>
 
 ##### Tests
 

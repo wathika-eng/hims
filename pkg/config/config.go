@@ -47,12 +47,14 @@ func LoadConfigs() (*Config, error) {
 		PORT:         viper.GetString("PORT"),
 	}
 
-	// critical DB fields, causes panic if missing
-	if config.DB_HOST == "" {
-		return nil, fmt.Errorf("DB_HOST is required")
-	}
-	if config.DB_USER == "" || config.DB_PASSWORD == "" || config.DB_NAME == "" {
-		return nil, fmt.Errorf("DB_USER, DB_PASSWORD, and DB_NAME are required")
+	// If a full DATABASE_URL is not provided, require individual DB fields
+	if config.DATABASE_URL == "" {
+		if config.DB_HOST == "" {
+			return nil, fmt.Errorf("DB_HOST is required when DATABASE_URL is not set")
+		}
+		if config.DB_USER == "" || config.DB_PASSWORD == "" || config.DB_NAME == "" {
+			return nil, fmt.Errorf("DB_USER, DB_PASSWORD, and DB_NAME are required when DATABASE_URL is not set")
+		}
 	}
 
 	return config, nil

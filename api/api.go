@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"hims/pkg/config"
 	"hims/pkg/database"
+	"hims/pkg/middlewares"
 	"hims/pkg/routes"
 	"log"
 	"log/slog"
@@ -70,24 +71,36 @@ func NewServer() {
 		MaxAge:        3600,
 	}))
 
+	// provide loaded config to middlewares that previously relied on package-init
+	middlewares.SetConfig(cfg)
 	routes.RegisterRoutes(app, cfg, db)
+	// Prefer the container/runtime provided PORT (e.g. Cloud Run) if set.
+	if p := os.Getenv("PORT"); p != "" {
+		cfg.PORT = p
+	}
 	if cfg.PORT == "" {
-		cfg.PORT = "8000"
+		cfg.PORT = "8080"
 	}
 
-	if err := app.Listen(fmt.Sprintf(":%v", cfg.PORT)); err != nil {
-		log.Fatalf("error while starting the server: %v", err)
-	}
+	log.Printf("starting server on :%s", cfg.PORT)
+
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+
+	srvErr := make(chan error, 1)
 	go func() {
-		if err := app.Listen(fmt.Sprintf(":%v", cfg.PORT)); err != nil {
+		srvErr <- app.Listen(fmt.Sprintf(":%v", cfg.PORT))
+	}()
+
+	select {
+	case <-ctx.Done():
+		log.Println("shutting down...")
+		if err := app.Shutdown(); err != nil {
+			log.Fatalf("failed to shutdown fiber: %v", err)
+		}
+	case err := <-srvErr:
+		if err != nil {
 			log.Fatalf("error while starting the server: %v", err)
 		}
-	}()
-	<-ctx.Done()
-	log.Println("shutting down...")
-	if err := app.Shutdown(); err != nil {
-		log.Fatalf("failed to shutdown fiber: %v", err)
 	}
 }

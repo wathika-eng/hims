@@ -3,7 +3,7 @@
   "buildCommand": "bun run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "$API_URL/api/$1" },
+    { "source": "/api/(.*)", "destination": "https://hims-506915313256.africa-south1.run.app/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
