@@ -130,3 +130,12 @@ X-Ratelimit-Reset: 1
 ![postman-tests](docs/postmanTests.png)
 
 ![PdfGen](docs/pdfGen.png)
+
+```bash
+gcloud run deploy hims     --source .     --port=8080     --set-env-vars="DB_TYPE=postgresql,\
+DATABASE_URL=,\
+DB_NAME=hims,\
+DB_USER=,\
+SECRET_KEY=,\
+GOTOOLCHAIN=go1.26.0+auto"
+```

@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { patientApi } from '../api'
 import type { Patient } from '../types'
-import { maskPhone, maskID } from '../utils/mask'
+import { maskPhone, maskID, maskName } from '../utils/mask'
 import ErrorAlert from '../components/ErrorAlert.vue'
 
 const route = useRoute()
@@ -62,12 +62,12 @@ function formatDate(dateStr: string | null | undefined) {
     </div>
 
     <template v-else-if="patient">
-      <div class="flex items-center gap-4 mb-8">
+      <div class="flex items-center gap-4 mb-6 sm:mb-8">
         <div class="w-16 h-16 rounded-full bg-cupertino-blue/10 text-cupertino-blue flex items-center justify-center text-xl font-bold">
           {{ patient.firstName[0] }}{{ patient.lastName[0] }}
         </div>
         <div>
-          <h1 class="text-2xl font-bold text-cupertino-gray-900">{{ patient.firstName }} {{ patient.lastName }}</h1>
+          <h1 class="text-2xl font-bold text-cupertino-gray-900">{{ maskName(patient.firstName, patient.lastName) }}</h1>
           <p class="text-sm text-cupertino-gray-400">Patient ID: {{ patient.ID }} &middot; {{ patient.role }}</p>
         </div>
       </div>

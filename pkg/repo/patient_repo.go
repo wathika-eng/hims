@@ -33,30 +33,19 @@ func (r *Repo) FetchPatients() ([]models.Patient, error) {
 	return patients, nil
 }
 
-func maskPhone(phone string) string {
-	if len(phone) < 7 {
-		return phone
-	}
-	return phone[:3] + "****" + phone[len(phone)-3:]
-}
-
-func maskID(id string) string {
-	if len(id) < 5 {
-		return id
-	}
-	return id[:2] + "****" + id[len(id)-2:]
-}
-
 func (r *Repo) LookupPatient(phoneNum, idNum string) (models.Patient, error) {
-	log.Printf("phone: %v, id: %v", maskPhone(phoneNum), maskID(idNum))
 	var patient models.Patient
 
-	q := r.db.NewSelect().Model(&patient).Relation("Programs").
-		WhereOr("id_number = ?", idNum).WhereOr("phone_number = ?", phoneNum)
+	q := r.db.NewSelect().Model(&patient).Relation("Programs")
+	if idNum != "" {
+		q = q.Where("id_number = ?", idNum)
+	}
+	if phoneNum != "" {
+		q = q.Where("phone_number = ?", phoneNum)
+	}
 	err := q.Limit(1).Scan(context.Background())
 	if err != nil {
-		return models.Patient{},
-			errors.New("patient not found, try again with either id or phone number")
+		return models.Patient{}, errors.New("patient not found")
 	}
 
 	return patient, nil

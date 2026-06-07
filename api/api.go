@@ -50,7 +50,7 @@ func NewServer() {
 	app.Use(recover.New())
 	app.Use(helmet.New(helmet.Config{
 		XSSProtection:         "1",
-		ContentSecurityPolicy: "",
+		ContentSecurityPolicy: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'",
 	}))
 	app.Use(limiter.New(limiter.Config{
 		Max:               20,
@@ -58,7 +58,7 @@ func NewServer() {
 		LimiterMiddleware: limiter.SlidingWindow{},
 	}))
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:5173/", "https://hmis-three.vercel.app/"},
+		AllowOrigins: []string{"http://localhost:5173", "https://hmis-three.vercel.app"},
 		AllowHeaders: []string{"Origin", "Content-Type", "Accept"},
 	}))
 

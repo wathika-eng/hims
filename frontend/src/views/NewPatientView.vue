@@ -3,11 +3,14 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { patientApi } from '../api'
 import { useToast } from '../composables/useToast'
+import { useCache } from '../composables/useCache'
+import { required, minLength, lettersOnly, alphanumeric, validKenyanPhone, inRange, validateAll } from '../utils/validators'
 import PageHeader from '../components/PageHeader.vue'
 import FormField from '../components/FormField.vue'
 
 const router = useRouter()
 const toast = useToast()
+const { invalidate } = useCache()
 const loading = ref(false)
 const serverError = ref<string | null>(null)
 
@@ -23,12 +26,13 @@ const form = ref({
 const fieldErrors = ref<Record<string, string>>({})
 
 function validate() {
-  fieldErrors.value = {}
-  if (!form.value.firstName || form.value.firstName.length < 3) fieldErrors.value.firstName = 'At least 3 characters'
-  if (!form.value.lastName || form.value.lastName.length < 3) fieldErrors.value.lastName = 'At least 3 characters'
-  if (!form.value.idNumber || form.value.idNumber.length < 8) fieldErrors.value.idNumber = 'At least 8 characters'
-  if (!form.value.phoneNumber || form.value.phoneNumber.length < 7) fieldErrors.value.phoneNumber = 'At least 7 characters'
-  if (!form.value.age || form.value.age < 1 || form.value.age > 255) fieldErrors.value.age = 'Must be 1–255'
+  fieldErrors.value = validateAll({
+    firstName: () => required(form.value.firstName, 'First name') ?? minLength(form.value.firstName, 3, 'First name') ?? lettersOnly(form.value.firstName, 'First name'),
+    lastName: () => required(form.value.lastName, 'Last name') ?? minLength(form.value.lastName, 3, 'Last name') ?? lettersOnly(form.value.lastName, 'Last name'),
+    idNumber: () => required(form.value.idNumber, 'ID number') ?? minLength(form.value.idNumber, 8, 'ID number') ?? alphanumeric(form.value.idNumber, 'ID number'),
+    phoneNumber: () => required(form.value.phoneNumber, 'Phone number') ?? validKenyanPhone(form.value.phoneNumber),
+    age: () => required(form.value.age, 'Age') ?? inRange(form.value.age, 1, 255, 'Age'),
+  })
   return Object.keys(fieldErrors.value).length === 0
 }
 
@@ -38,6 +42,7 @@ async function handleSubmit() {
   serverError.value = null
   try {
     await patientApi.create(form.value)
+    await invalidate('patients')
     toast.success(`Patient ${form.value.firstName} ${form.value.lastName} created`)
     router.push('/patients')
   } catch (e: any) {

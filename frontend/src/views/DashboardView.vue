@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { patientApi, programApi } from '../api'
+import { useCache } from '../composables/useCache'
 import type { Patient, Program } from '../types'
-import { maskID } from '../utils/mask'
+import { maskID, maskName } from '../utils/mask'
 import PageHeader from '../components/PageHeader.vue'
 import StatCard from '../components/StatCard.vue'
 import ErrorAlert from '../components/ErrorAlert.vue'
@@ -11,6 +12,7 @@ const patients = ref<Patient[]>([])
 const programs = ref<Program[]>([])
 const loading = ref(true)
 const fetchError = ref<string | null>(null)
+const { fetchWithCache } = useCache()
 
 const enrolledCount = computed(() => patients.value.filter(p => p.patientPrograms?.length).length)
 const avgAge = computed(() =>
@@ -29,11 +31,11 @@ const icons = {
 onMounted(async () => {
   try {
     const [pats, progs] = await Promise.all([
-      patientApi.list(),
-      programApi.list(),
+      fetchWithCache('patients', () => patientApi.list().then(r => r.data.data), 2 * 60 * 1000),
+      fetchWithCache('programs', () => programApi.list().then(r => r.data.data), 2 * 60 * 1000),
     ])
-    patients.value = pats.data.data
-    programs.value = progs.data.data
+    patients.value = pats.data
+    programs.value = progs.data
   } catch (e: any) {
     fetchError.value = e.userMessage || 'Failed to load dashboard data'
   } finally {
@@ -46,7 +48,7 @@ onMounted(async () => {
   <div>
     <PageHeader title="Dashboard" subtitle="Overview of your health information system" />
 
-    <ErrorAlert :message="fetchError" title="Failed to load" />
+    <ErrorAlert :message="fetchError" title="Failed to load" class="mb-4 sm:mb-6" />
 
     <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div v-for="i in 4" :key="i" class="bg-white/70 rounded-2xl border border-cupertino-gray-100/60 p-5 shadow-sm animate-pulse">
@@ -84,7 +86,7 @@ onMounted(async () => {
                 {{ p.firstName[0] }}{{ p.lastName[0] }}
               </div>
               <div>
-                <p class="text-sm font-medium text-cupertino-gray-900">{{ p.firstName }} {{ p.lastName }}</p>
+                <p class="text-sm font-medium text-cupertino-gray-900">{{ maskName(p.firstName, p.lastName) }}</p>
                 <p class="text-xs text-cupertino-gray-400 font-mono">{{ maskID(p.idNumber) }}</p>
               </div>
             </div>

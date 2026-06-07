@@ -9,28 +9,40 @@ import (
 
 // endpoint to handle doc creation
 func (h *Handler) NewDoctor(ctx fiber.Ctx) error {
-	var reqBody models.Doctor
+	var input models.DoctorSignupInput
 
-	if err := ctx.Bind().Body(&reqBody); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	if err := ctx.Bind().Body(&input); err != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": true,
+			"data":  "invalid request body",
+		})
 	}
 
-	if err := h.services.Validate(reqBody); err != nil {
+	if err := h.services.Validate(input); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
 			"error": true,
 			"data":  err,
 		})
 	}
 
-	if err := h.services.CreateDoctor(&reqBody); err != nil {
+	doctor := models.Doctor{
+		FirstName:      input.FirstName,
+		LastName:       input.LastName,
+		Email:          input.Email,
+		Password:       input.Password,
+		LicenseNumber:  input.LicenseNumber,
+		Specialization: input.Specialization,
+	}
+
+	if err := h.services.CreateDoctor(&doctor); err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "failed to create account",
 		})
 	}
 
 	return ctx.Status(201).JSON(fiber.Map{
-		"data":  fmt.Sprintf("doctor %v created successfully", reqBody.Email),
+		"data":  fmt.Sprintf("doctor %v created successfully", input.Email),
 		"error": false,
 	})
 }
@@ -45,7 +57,7 @@ func (h *Handler) LoginDoctor(ctx fiber.Ctx) error {
 	if err := ctx.Bind().Body(&reqBody); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "invalid request body",
 		})
 	}
 	if err := h.services.Validate(reqBody); err != nil {
@@ -56,9 +68,9 @@ func (h *Handler) LoginDoctor(ctx fiber.Ctx) error {
 	}
 	token, err := h.services.LoginUser(reqBody.Email, reqBody.Password)
 	if err != nil {
-		return ctx.Status(500).JSON(fiber.Map{
+		return ctx.Status(401).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "invalid email or password",
 		})
 	}
 	return ctx.JSON(fiber.Map{

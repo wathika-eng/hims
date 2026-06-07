@@ -12,11 +12,12 @@ import (
 // generate token and sign it with secret key
 func (s *Service) generateToken(email, role string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"iss": "HIMS API",
-		"sub": email,
-		"aud": role,
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(time.Hour).Unix(),
+		"iss":  "HIMS API",
+		"sub":  email,
+		"aud":  role,
+		"demo": true,
+		"iat":  time.Now().Unix(),
+		"exp":  time.Now().Add(time.Hour).Unix(),
 	})
 	signedToken, err := token.SignedString([]byte(s.cfg.SECRET_KEY))
 	if err != nil {

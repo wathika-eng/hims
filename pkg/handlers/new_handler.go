@@ -25,5 +25,6 @@ func (h *Handler) TestAPI(ctx fiber.Ctx) error {
 	return ctx.JSON(fiber.Map{
 		"time": time.Now().String(),
 		"data": h.repo.Stats(),
+		"demo": true,
 	})
 }

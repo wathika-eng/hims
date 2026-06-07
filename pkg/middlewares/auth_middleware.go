@@ -25,10 +25,10 @@ func Auth(ctx fiber.Ctx) error {
 	}
 	return jwtware.New(jwtware.Config{
 		SigningKey: jwtware.SigningKey{Key: []byte(cfg.SECRET_KEY)},
-		ErrorHandler: func(ctx fiber.Ctx, err error) error {
+		ErrorHandler: func(ctx fiber.Ctx, _ error) error {
 			return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"error":   "true",
-				"message": err.Error(),
+				"message": "unauthorized",
 			})
 		},
 	})(ctx)

@@ -29,6 +29,7 @@ export interface Program {
   ID: number
   program: string
   programCode: number
+  patientsEnrolled?: Patient[]
 }
 
 export interface ApiResponse<T> {

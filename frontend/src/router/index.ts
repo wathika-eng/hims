@@ -1,5 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    if (!payload.exp) return false
+    return Date.now() >= payload.exp * 1000
+  } catch {
+    return true
+  }
+}
+
+function clearSession() {
+  localStorage.removeItem('token')
+}
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -26,6 +40,7 @@ const router = createRouter({
         { path: 'patients/:id', name: 'patient-profile', component: () => import('../views/PatientProfileView.vue') },
         { path: 'programs', name: 'programs', component: () => import('../views/ProgramsView.vue') },
         { path: 'programs/new', name: 'new-program', component: () => import('../views/NewProgramView.vue') },
+        { path: 'programs/:id', name: 'program-detail', component: () => import('../views/ProgramDetailView.vue') },
         { path: 'enroll', name: 'enroll', component: () => import('../views/EnrollView.vue') },
       ],
     },
@@ -34,13 +49,21 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const token = localStorage.getItem('token')
-  if (to.meta.requiresAuth && !token) {
-    next('/login')
-  } else if (to.meta.guest && token) {
-    next('/')
-  } else {
-    next()
+
+  if (token && isTokenExpired(token)) {
+    clearSession()
+    return next('/login')
   }
+
+  if (to.meta.requiresAuth && !token) {
+    return next('/login')
+  }
+
+  if (to.meta.guest && token) {
+    return next('/')
+  }
+
+  next()
 })
 
 export default router

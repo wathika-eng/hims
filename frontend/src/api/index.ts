@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '../router'
 import type { ApiResponse, LoginResponse, Patient, Program } from '../types'
 
 function extractError(err: any): string {
@@ -40,7 +41,7 @@ api.interceptors.response.use(
   (err) => {
     if (err.response?.status === 401) {
       localStorage.removeItem('token')
-      window.location.href = '/login'
+      router.push('/login')
     }
     err.userMessage = extractError(err)
     return Promise.reject(err)

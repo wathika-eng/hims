@@ -26,25 +26,25 @@ func (r *Repo) Seed() error {
 	hashedPass := string(pass)
 
 	doctors := []*models.Doctor{
-		{FirstName: "John", LastName: "Doe", Email: "john.doe@hospital.com", Password: hashedPass, LicenseNumber: "LIC-001", Specialization: "Cardiology"},
-		{FirstName: "Jane", LastName: "Smith", Email: "jane.smith@hospital.com", Password: hashedPass, LicenseNumber: "LIC-002", Specialization: "Pediatrics"},
-		{FirstName: "Samuel", LastName: "Mwangi", Email: "samuel.mwangi@hospital.com", Password: hashedPass, LicenseNumber: "LIC-003", Specialization: "Internal Medicine"},
+		{FirstName: "Demo", LastName: "Doctor", Email: "john.doe@hospital.com", Password: hashedPass, LicenseNumber: "LIC-001", Specialization: "Cardiology"},
+		{FirstName: "Demo", LastName: "Doctor", Email: "jane.smith@hospital.com", Password: hashedPass, LicenseNumber: "LIC-002", Specialization: "Pediatrics"},
+		{FirstName: "Demo", LastName: "Doctor", Email: "samuel.mwangi@hospital.com", Password: hashedPass, LicenseNumber: "LIC-003", Specialization: "Internal Medicine"},
 	}
 	if _, err := r.db.NewInsert().Model(&doctors).Exec(ctx); err != nil {
 		return err
 	}
 
 	patients := []*models.Patient{
-		{FirstName: "Alice", LastName: "Wanjiku", IDNumber: "12345678", PhoneNumber: "254712345678", Gender: "female", Age: 30},
-		{FirstName: "Bob", LastName: "Kiplagat", IDNumber: "23456789", PhoneNumber: "254723456789", Gender: "male", Age: 45},
-		{FirstName: "Carol", LastName: "Akinyi", IDNumber: "34567890", PhoneNumber: "254734567890", Gender: "female", Age: 25},
-		{FirstName: "David", LastName: "Omondi", IDNumber: "45678901", PhoneNumber: "254745678901", Gender: "male", Age: 55},
-		{FirstName: "Esther", LastName: "Muthoni", IDNumber: "56789012", PhoneNumber: "254756789012", Gender: "female", Age: 35},
-		{FirstName: "Francis", LastName: "Kamau", IDNumber: "67890123", PhoneNumber: "254767890123", Gender: "male", Age: 60},
-		{FirstName: "Grace", LastName: "Nyambura", IDNumber: "78901234", PhoneNumber: "254778901234", Gender: "female", Age: 28},
-		{FirstName: "Henry", LastName: "Kiprop", IDNumber: "89012345", PhoneNumber: "254789012345", Gender: "male", Age: 40},
-		{FirstName: "Irene", LastName: "Chebet", IDNumber: "90123456", PhoneNumber: "254790123456", Gender: "female", Age: 32},
-		{FirstName: "James", LastName: "Otieno", IDNumber: "01234567", PhoneNumber: "254701234567", Gender: "male", Age: 50},
+		{FirstName: "Demo", LastName: "Patient", IDNumber: "DEMO001", PhoneNumber: "254700000001", Gender: "female", Age: 30},
+		{FirstName: "Demo", LastName: "Patient", IDNumber: "DEMO002", PhoneNumber: "254700000002", Gender: "male", Age: 45},
+		{FirstName: "Demo", LastName: "Patient", IDNumber: "DEMO003", PhoneNumber: "254700000003", Gender: "female", Age: 25},
+		{FirstName: "Demo", LastName: "Patient", IDNumber: "DEMO004", PhoneNumber: "254700000004", Gender: "male", Age: 55},
+		{FirstName: "Demo", LastName: "Patient", IDNumber: "DEMO005", PhoneNumber: "254700000005", Gender: "female", Age: 35},
+		{FirstName: "Demo", LastName: "Patient", IDNumber: "DEMO006", PhoneNumber: "254700000006", Gender: "male", Age: 60},
+		{FirstName: "Demo", LastName: "Patient", IDNumber: "DEMO007", PhoneNumber: "254700000007", Gender: "female", Age: 28},
+		{FirstName: "Demo", LastName: "Patient", IDNumber: "DEMO008", PhoneNumber: "254700000008", Gender: "male", Age: 40},
+		{FirstName: "Demo", LastName: "Patient", IDNumber: "DEMO009", PhoneNumber: "254700000009", Gender: "female", Age: 32},
+		{FirstName: "Demo", LastName: "Patient", IDNumber: "DEMO010", PhoneNumber: "254700000010", Gender: "male", Age: 50},
 	}
 	if _, err := r.db.NewInsert().Model(&patients).Exec(ctx); err != nil {
 		return err

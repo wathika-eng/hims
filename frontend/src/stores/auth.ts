@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authApi } from '../api'
 import { useRouter } from 'vue-router'
+import { clearAllCache } from '../composables/useCache'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('token'))
@@ -46,6 +47,7 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     token.value = null
     localStorage.removeItem('token')
+    clearAllCache()
     router.push('/login')
   }
 

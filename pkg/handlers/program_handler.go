@@ -15,7 +15,7 @@ func (h *Handler) AddProgram(ctx fiber.Ctx) error {
 	if err := ctx.Bind().Body(&reqBody); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "invalid request body",
 		})
 	}
 	if err := h.services.Validate(reqBody); err != nil {
@@ -27,7 +27,7 @@ func (h *Handler) AddProgram(ctx fiber.Ctx) error {
 	if err := h.repo.InsertNewProgram(&reqBody); err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "failed to create program",
 		})
 	}
 	return ctx.Status(201).JSON(fiber.Map{
@@ -48,7 +48,7 @@ func (h *Handler) AddPatientProgram(ctx fiber.Ctx) error {
 	if err := ctx.Bind().Body(&reqBody); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "invalid request body",
 		})
 	}
 	if err := h.services.Validate(reqBody); err != nil {
@@ -61,7 +61,7 @@ func (h *Handler) AddPatientProgram(ctx fiber.Ctx) error {
 	if err != nil || program.Name == "" {
 		return ctx.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "program not found",
 		})
 	}
 
@@ -69,7 +69,7 @@ func (h *Handler) AddPatientProgram(ctx fiber.Ctx) error {
 	if err != nil || patient.IDNumber == "" {
 		return ctx.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "patient not found",
 		})
 	}
 
@@ -77,7 +77,7 @@ func (h *Handler) AddPatientProgram(ctx fiber.Ctx) error {
 	if err != nil || patient.IDNumber == "" {
 		return ctx.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "failed to enroll patient",
 		})
 	}
 
@@ -94,7 +94,7 @@ func (h *Handler) GetPrograms(ctx fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "failed to fetch programs",
 		})
 	}
 	if len(programs) == 0 {
@@ -122,6 +122,13 @@ func maskPhone(phone string) string {
 		return phone
 	}
 	return phone[:3] + "****" + phone[len(phone)-3:]
+}
+
+func maskShortName(s string) string {
+	if len(s) == 0 {
+		return ""
+	}
+	return string(s[0]) + "."
 }
 
 // returns a pdf of programs and patients enrolled in each
@@ -167,7 +174,7 @@ func (h *Handler) GeneratePDF(ctx fiber.Ctx) error {
 
 		pdf.SetFont("Arial", "", 11)
 		for _, patient := range prog.Patients {
-			fullName := patient.FirstName + " " + patient.LastName
+			fullName := patient.FirstName + " " + maskShortName(patient.LastName)
 			pdf.CellFormat(30, 7, maskID(patient.IDNumber), "1", 0, "", false, 0, "")
 			pdf.CellFormat(40, 7, fullName, "1", 0, "", false, 0, "")
 			pdf.CellFormat(30, 7, maskPhone(patient.PhoneNumber), "1", 0, "", false, 0, "")

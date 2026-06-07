@@ -11,7 +11,7 @@ defineProps<{
   <div class="bg-white/70 backdrop-blur-2xl rounded-2xl border border-cupertino-gray-100/60 p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:border-cupertino-gray-200/60">
     <div class="flex items-start justify-between">
       <div>
-        <p class="text-sm font-medium text-cupertino-gray-400">{{ label }}</p>
+        <p class="text-sm font-medium text-cupertino-gray-500">{{ label }}</p>
         <p class="mt-1 text-3xl font-bold text-cupertino-gray-900 tracking-tight">{{ value }}</p>
       </div>
       <div

@@ -12,18 +12,21 @@ import (
 func (h *Handler) NewPatient(ctx fiber.Ctx) error {
 	var reqBody models.Patient
 	if err := ctx.Bind().Body(&reqBody); err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return ctx.Status(400).JSON(fiber.Map{
+			"error": true,
+			"data":  "invalid request body",
+		})
 	}
 	if err := h.services.Validate(reqBody); err != nil {
 		return ctx.Status(400).JSON(fiber.Map{
 			"error": true,
-			"date":  err,
+			"data":  err,
 		})
 	}
 	if err := h.services.CreatePatient(&reqBody); err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "failed to create patient",
 		})
 	}
 	return ctx.Status(201).JSON(fiber.Map{
@@ -47,7 +50,14 @@ func (h *Handler) Profile(ctx fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(404).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "patient not found",
+		})
+	}
+
+	if patient.ID == 0 {
+		return ctx.Status(404).JSON(fiber.Map{
+			"error": true,
+			"data":  "patient not found",
 		})
 	}
 
@@ -63,7 +73,7 @@ func (h *Handler) GetPatients(ctx fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(500).JSON(fiber.Map{
 			"error": true,
-			"data":  err.Error(),
+			"data":  "failed to fetch patients",
 		})
 	}
 	if len(patients) == 0 {

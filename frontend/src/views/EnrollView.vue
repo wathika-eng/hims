@@ -3,12 +3,15 @@ import { ref, onMounted } from 'vue'
 import { patientApi, programApi } from '../api'
 import type { Patient, Program } from '../types'
 import { useToast } from '../composables/useToast'
-import { maskID } from '../utils/mask'
+import { useCache } from '../composables/useCache'
+import { maskID, maskName } from '../utils/mask'
+import { required, validateAll } from '../utils/validators'
 import PageHeader from '../components/PageHeader.vue'
 import ErrorAlert from '../components/ErrorAlert.vue'
 import FormField from '../components/FormField.vue'
 
 const toast = useToast()
+const { invalidate, fetchWithCache } = useCache()
 const loading = ref(false)
 const serverError = ref<string | null>(null)
 
@@ -16,6 +19,8 @@ const patients = ref<Patient[]>([])
 const programs = ref<Program[]>([])
 const loadError = ref<string | null>(null)
 const loadingData = ref(true)
+
+const fieldErrors = ref<Record<string, string>>({})
 
 const form = ref({
   patientID: '',
@@ -25,11 +30,11 @@ const form = ref({
 onMounted(async () => {
   try {
     const [pats, progs] = await Promise.all([
-      patientApi.list(),
-      programApi.list(),
+      fetchWithCache('patients', () => patientApi.list().then(r => r.data.data), 2 * 60 * 1000),
+      fetchWithCache('programs', () => programApi.list().then(r => r.data.data), 2 * 60 * 1000),
     ])
-    patients.value = pats.data.data
-    programs.value = progs.data.data
+    patients.value = pats.data
+    programs.value = progs.data
   } catch (e: any) {
     loadError.value = e.userMessage || 'Failed to load form data'
   } finally {
@@ -38,15 +43,17 @@ onMounted(async () => {
 })
 
 async function handleEnroll() {
-  if (!form.value.patientID || !form.value.programName) {
-    serverError.value = 'Please select both a patient and a program'
-    return
-  }
+  fieldErrors.value = validateAll({
+    patientID: () => required(form.value.patientID, 'Patient'),
+    programName: () => required(form.value.programName, 'Program'),
+  })
+  if (Object.keys(fieldErrors.value).length > 0) return
   loading.value = true
   serverError.value = null
   try {
     const res = await programApi.enroll(form.value)
-    const name = `${res.data.data.firstName} ${res.data.data.lastName}`
+    const name = maskName(res.data.data.firstName, res.data.data.lastName)
+    await Promise.all([invalidate('patients'), invalidate('programs')])
     toast.success(`Enrolled ${name} successfully`)
     form.value = { patientID: '', programName: '' }
   } catch (e: any) {
@@ -69,8 +76,8 @@ async function handleEnroll() {
     </div>
 
     <form v-else-if="!loadError" @submit.prevent="handleEnroll" class="bg-white/70 backdrop-blur-2xl rounded-3xl border border-cupertino-gray-100/60 p-6 shadow-sm space-y-4">
-      <FormField label="Patient">
-        <select v-model="form.patientID" required class="w-full px-4 py-3 rounded-xl bg-cupertino-gray-50 border border-cupertino-gray-100 text-sm text-cupertino-gray-900 focus:outline-none focus:ring-2 focus:ring-cupertino-blue/30 transition-all appearance-none">
+      <FormField label="Patient" :error="fieldErrors.patientID">
+        <select v-model="form.patientID" class="w-full px-4 py-3 rounded-xl bg-cupertino-gray-50 border text-sm text-cupertino-gray-900 focus:outline-none focus:ring-2 focus:ring-cupertino-blue/30 transition-all appearance-none" :class="fieldErrors.patientID ? 'border-cupertino-red/40' : 'border-cupertino-gray-100'">
           <option value="" disabled>Select a patient</option>
           <option v-for="p in patients" :key="p.ID" :value="p.idNumber">{{ p.firstName }} {{ p.lastName }} ({{ maskID(p.idNumber) }})</option>
         </select>
@@ -80,8 +87,8 @@ async function handleEnroll() {
         </p>
       </FormField>
 
-      <FormField label="Program">
-        <select v-model="form.programName" required class="w-full px-4 py-3 rounded-xl bg-cupertino-gray-50 border border-cupertino-gray-100 text-sm text-cupertino-gray-900 focus:outline-none focus:ring-2 focus:ring-cupertino-blue/30 transition-all appearance-none">
+      <FormField label="Program" :error="fieldErrors.programName">
+        <select v-model="form.programName" class="w-full px-4 py-3 rounded-xl bg-cupertino-gray-50 border text-sm text-cupertino-gray-900 focus:outline-none focus:ring-2 focus:ring-cupertino-blue/30 transition-all appearance-none" :class="fieldErrors.programName ? 'border-cupertino-red/40' : 'border-cupertino-gray-100'">
           <option value="" disabled>Select a program</option>
           <option v-for="prog in programs" :key="prog.ID" :value="prog.program">{{ prog.program }} (#{{ prog.programCode }})</option>
         </select>

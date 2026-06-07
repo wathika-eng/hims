@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
+defineProps<{ open?: boolean }>()
+const emit = defineEmits<{ close: [] }>()
+
 const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
 
 const links = [
@@ -30,10 +34,87 @@ function iconSvg(name: string) {
   }
   return icons[name] || ''
 }
+
+function handleNav(to: string) {
+  emit('close')
+  router.push(to)
+}
+
+function handleLogout() {
+  emit('close')
+  auth.logout()
+}
 </script>
 
 <template>
-  <aside class="w-64 min-h-screen bg-white/80 backdrop-blur-2xl border-r border-cupertino-gray-100/50 flex flex-col">
+  <!-- Mobile overlay backdrop -->
+  <Transition name="sidebar-overlay">
+    <div v-if="open" class="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden" @click="emit('close')" />
+  </Transition>
+
+  <!-- Mobile sidebar (slide-out drawer) -->
+  <Transition name="sidebar">
+    <aside
+      v-if="open"
+      class="fixed inset-y-0 left-0 z-50 w-64 bg-white/90 backdrop-blur-2xl border-r border-cupertino-gray-100/50 flex flex-col shadow-2xl lg:hidden"
+    >
+      <div class="px-5 pt-6 pb-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-cupertino-blue flex items-center justify-center shadow-sm">
+            <svg viewBox="0 0 24 24" class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-sm font-semibold text-cupertino-gray-900 leading-tight">HIMS</h1>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <p class="text-[11px] text-cupertino-gray-500 leading-tight">Health Information</p>
+              <span class="text-[10px] font-semibold px-1.5 py-[1px] rounded-md bg-cupertino-orange/10 text-cupertino-orange leading-tight">DEMO</span>
+            </div>
+          </div>
+        </div>
+        <button @click="emit('close')" aria-label="Close menu" class="p-1.5 rounded-lg text-cupertino-gray-400 hover:text-cupertino-gray-600 hover:bg-cupertino-gray-100 transition-colors">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <nav class="flex-1 px-3 space-y-0.5">
+        <button
+          v-for="link in links"
+          :key="link.to"
+          @click="handleNav(link.to)"
+          :class="[
+            'flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 w-full text-left',
+            isActive(link.to)
+              ? 'bg-cupertino-blue/10 text-cupertino-blue'
+              : 'text-cupertino-gray-500 hover:text-cupertino-gray-700 hover:bg-cupertino-gray-50',
+          ]"
+        >
+          <svg viewBox="0 0 24 24" class="w-5 h-5 shrink-0" fill="currentColor">
+            <path :d="iconSvg(link.icon)" />
+          </svg>
+          <span>{{ link.label }}</span>
+        </button>
+      </nav>
+
+      <div class="px-3 pb-4 pt-3 border-t border-cupertino-gray-100/50">
+        <button
+          @click="handleLogout"
+          class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-cupertino-red/80 hover:bg-cupertino-red/5 w-full transition-colors"
+        >
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </aside>
+  </Transition>
+
+  <!-- Desktop sidebar (always visible) -->
+  <aside class="hidden lg:flex w-64 min-h-screen bg-white/80 backdrop-blur-2xl border-r border-cupertino-gray-100/50 flex-col shrink-0">
     <div class="px-5 pt-6 pb-4">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-xl bg-cupertino-blue flex items-center justify-center shadow-sm">
@@ -41,14 +122,17 @@ function iconSvg(name: string) {
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
           </svg>
         </div>
-        <div>
-          <h1 class="text-sm font-semibold text-cupertino-gray-900 leading-tight">HIMS</h1>
-          <p class="text-[11px] text-cupertino-gray-400 leading-tight">Health Information</p>
+          <div>
+            <h1 class="text-sm font-semibold text-cupertino-gray-900 leading-tight">HIMS</h1>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <p class="text-[11px] text-cupertino-gray-500 leading-tight">Health Information</p>
+              <span class="text-[10px] font-semibold px-1.5 py-[1px] rounded-md bg-cupertino-orange/10 text-cupertino-orange leading-tight">DEMO</span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <nav class="flex-1 px-3 space-y-0.5">
+      <nav class="flex-1 px-3 space-y-0.5">
       <router-link
         v-for="link in links"
         :key="link.to"
@@ -82,3 +166,14 @@ function iconSvg(name: string) {
     </div>
   </aside>
 </template>
+
+<style scoped>
+.sidebar-enter-active { transition: transform 0.25s ease-out; }
+.sidebar-leave-active { transition: transform 0.2s ease-in; }
+.sidebar-enter-from { transform: translateX(-100%); }
+.sidebar-leave-to { transform: translateX(-100%); }
+.sidebar-overlay-enter-active { transition: opacity 0.25s ease-out; }
+.sidebar-overlay-leave-active { transition: opacity 0.2s ease-in; }
+.sidebar-overlay-enter-from,
+.sidebar-overlay-leave-to { opacity: 0; }
+</style>

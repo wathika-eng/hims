@@ -8,12 +8,11 @@ const auth = useAuthStore()
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
-const showDemo = ref(false)
 
 const demoAccounts = [
-  { email: 'john.doe@hospital.com', password: 'password123', name: 'Dr. John Doe', specialization: 'Cardiology' },
-  { email: 'jane.smith@hospital.com', password: 'password123', name: 'Dr. Jane Smith', specialization: 'Pediatrics' },
-  { email: 'samuel.mwangi@hospital.com', password: 'password123', name: 'Dr. Samuel Mwangi', specialization: 'Internal Medicine' },
+  { email: 'john.doe@hospital.com', password: 'password123', name: 'Demo Doctor', specialization: 'Cardiology' },
+  { email: 'jane.smith@hospital.com', password: 'password123', name: 'Demo Doctor', specialization: 'Pediatrics' },
+  { email: 'samuel.mwangi@hospital.com', password: 'password123', name: 'Demo Doctor', specialization: 'Internal Medicine' },
 ] as const
 
 async function handleLogin() {
@@ -22,6 +21,7 @@ async function handleLogin() {
 }
 
 function selectDemo(acc: typeof demoAccounts[number]) {
+  auth.clearError()
   email.value = acc.email
   password.value = acc.password
   handleLogin()
@@ -31,14 +31,30 @@ function selectDemo(acc: typeof demoAccounts[number]) {
 <template>
   <div class="min-h-screen bg-cupertino-gray-50 flex items-center justify-center p-4">
     <div class="w-full max-w-sm">
-      <div class="text-center mb-8">
+      <!-- Demo mode banner -->
+      <div class="mb-6 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-cupertino-orange/15 border-l-4 border-cupertino-orange shadow-sm">
+        <svg viewBox="0 0 24 24" class="w-5 h-5 shrink-0 text-cupertino-orange" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+        <p class="text-xs text-cupertino-orange/90 leading-relaxed">
+          <strong class="text-cupertino-orange">Demo Mode</strong> — All data shown is simulated test data. Names, IDs, and phone numbers have been masked to protect privacy.
+        </p>
+      </div>
+
+      <div class="text-center mb-6">
         <div class="w-16 h-16 rounded-2xl bg-cupertino-blue mx-auto flex items-center justify-center shadow-lg shadow-cupertino-blue/20 mb-4">
           <svg viewBox="0 0 24 24" class="w-9 h-9 text-white" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
           </svg>
         </div>
-        <h1 class="text-2xl font-bold text-cupertino-gray-900 tracking-tight">Welcome to HIMS</h1>
-        <p class="mt-1 text-sm text-cupertino-gray-400">Sign in to your account</p>
+        <h1 class="text-2xl font-bold text-cupertino-gray-900 tracking-tight">HIMS</h1>
+        <p class="mt-1 text-sm text-cupertino-gray-500">Health Information Management System</p>
+      </div>
+
+      <div class="mb-5 p-4 rounded-2xl bg-cupertino-blue/5 border border-cupertino-blue/15">
+        <p class="text-xs text-cupertino-gray-500 leading-relaxed">
+          Welcome to the HIMS demo. This application lets you manage patients, healthcare programs, and enrollments. Explore the dashboard, register test patients, and try out all features — nothing is real.
+        </p>
       </div>
 
       <form @submit.prevent="handleLogin" class="bg-white/70 backdrop-blur-2xl rounded-3xl border border-cupertino-gray-100/60 p-6 shadow-sm space-y-4">
@@ -59,7 +75,7 @@ function selectDemo(acc: typeof demoAccounts[number]) {
               placeholder="Your password"
               class="w-full px-4 py-3 rounded-xl bg-cupertino-gray-50 border border-cupertino-gray-100 text-sm text-cupertino-gray-900 placeholder:text-cupertino-gray-300 focus:outline-none focus:ring-2 focus:ring-cupertino-blue/30 focus:border-cupertino-blue transition-all pr-10"
             />
-            <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-cupertino-gray-400 hover:text-cupertino-gray-600">
+            <button type="button" @click="showPassword = !showPassword" :aria-label="showPassword ? 'Hide password' : 'Show password'" class="absolute right-3 top-1/2 -translate-y-1/2 text-cupertino-gray-400 hover:text-cupertino-gray-600">
               <svg v-if="!showPassword" viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
               </svg>
@@ -87,39 +103,35 @@ function selectDemo(acc: typeof demoAccounts[number]) {
           </span>
           <span v-else>Sign In</span>
         </button>
-
-        <div class="border-t border-cupertino-gray-100/60 pt-4">
-          <button type="button" @click="showDemo = !showDemo" class="flex items-center gap-2 text-xs font-semibold text-cupertino-gray-400 hover:text-cupertino-gray-600 transition-colors w-full">
-            <svg viewBox="0 0 24 24" class="w-4 h-4" :class="showDemo ? 'rotate-90' : ''" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
-            Quick login with demo accounts
-          </button>
-          <Transition name="demo">
-            <div v-if="showDemo" class="mt-3 space-y-2">
-              <button
-                v-for="acc in demoAccounts"
-                :key="acc.email"
-                type="button"
-                @click="selectDemo(acc)"
-                class="w-full text-left px-3.5 py-2.5 rounded-xl bg-cupertino-gray-50 border border-cupertino-gray-100 hover:bg-cupertino-blue/5 hover:border-cupertino-blue/20 transition-all active:scale-[0.99]"
-              >
-                <p class="text-sm font-medium text-cupertino-gray-900">{{ acc.name }}</p>
-                <p class="text-xs text-cupertino-gray-400 mt-0.5">{{ acc.email }} · {{ acc.specialization }}</p>
-              </button>
-            </div>
-          </Transition>
-        </div>
       </form>
 
+      <!-- Demo accounts section - always visible -->
+      <div class="mt-4 bg-white/70 backdrop-blur-2xl rounded-3xl border border-cupertino-gray-100/60 p-5 shadow-sm">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-6 h-6 rounded-lg bg-cupertino-orange/10 flex items-center justify-center">
+            <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-cupertino-orange" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          </div>
+          <p class="text-xs font-semibold text-cupertino-gray-500 uppercase tracking-wide">Try it now — no signup needed</p>
+        </div>
+        <p class="text-xs text-cupertino-gray-400 mb-3 leading-relaxed">Click any demo account to instantly sign in and explore.</p>
+        <div class="space-y-2">
+          <button
+            v-for="acc in demoAccounts"
+            :key="acc.email"
+            type="button"
+            @click="selectDemo(acc)"
+            class="w-full text-left px-3.5 py-2.5 rounded-xl bg-cupertino-gray-50 border border-cupertino-gray-100 hover:bg-cupertino-blue/5 hover:border-cupertino-blue/20 transition-all active:scale-[0.99]"
+          >
+            <p class="text-sm font-medium text-cupertino-gray-900">{{ acc.name }} — {{ acc.specialization }}</p>
+            <p class="text-xs text-cupertino-gray-400 mt-0.5 font-mono">{{ acc.email }}</p>
+          </button>
+        </div>
+      </div>
+
       <p class="mt-6 text-center text-sm text-cupertino-gray-400">
-        Don't have an account?
-        <router-link to="/signup" class="text-cupertino-blue font-semibold hover:underline">Sign Up</router-link>
+        New to HIMS?
+        <router-link to="/signup" class="text-cupertino-blue font-semibold hover:underline">Create an account</router-link>
       </p>
     </div>
   </div>
 </template>
-
-<style scoped>
-.demo-enter-active { transition: all 0.25s ease-out; }
-.demo-leave-active { transition: all 0.2s ease-in; }
-.demo-enter-from, .demo-leave-to { opacity: 0; transform: translateY(-8px); }
-</style>

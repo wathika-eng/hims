@@ -3,11 +3,14 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { programApi } from '../api'
 import { useToast } from '../composables/useToast'
+import { useCache } from '../composables/useCache'
+import { required, minLength, inRange, validateAll } from '../utils/validators'
 import PageHeader from '../components/PageHeader.vue'
 import FormField from '../components/FormField.vue'
 
 const router = useRouter()
 const toast = useToast()
+const { invalidate } = useCache()
 const loading = ref(false)
 const serverError = ref<string | null>(null)
 
@@ -16,16 +19,13 @@ const form = ref({
   programCode: 0,
 })
 
-const fieldErrors = ref<{ program?: string; programCode?: string }>({})
+const fieldErrors = ref<Record<string, string>>({})
 
 function validate() {
-  fieldErrors.value = {}
-  if (!form.value.program || form.value.program.length < 3) {
-    fieldErrors.value.program = 'Must be at least 3 characters'
-  }
-  if (!form.value.programCode || form.value.programCode < 1 || form.value.programCode > 9999) {
-    fieldErrors.value.programCode = 'Must be between 1 and 9999'
-  }
+  fieldErrors.value = validateAll({
+    program: () => required(form.value.program, 'Program name') ?? minLength(form.value.program, 3, 'Program name'),
+    programCode: () => required(form.value.programCode, 'Program code') ?? inRange(form.value.programCode, 1, 9999, 'Program code'),
+  })
   return Object.keys(fieldErrors.value).length === 0
 }
 
@@ -35,6 +35,7 @@ async function handleSubmit() {
   serverError.value = null
   try {
     await programApi.create(form.value)
+    await invalidate('programs')
     toast.success(`Program "${form.value.program}" created`)
     router.push('/programs')
   } catch (e: any) {

@@ -12,3 +12,12 @@ export function maskID(id: string): string {
   const suffix = id.slice(-2)
   return `${prefix}****${suffix}`
 }
+
+export function maskName(firstName: string, lastName: string): string {
+  const first = firstName?.trim() || ''
+  const last = lastName?.trim() || ''
+  if (!first && !last) return '—'
+  if (!first) return `${last[0]}.`
+  if (!last) return first
+  return `${first} ${last[0]}.`
+}
