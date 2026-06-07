@@ -127,8 +127,9 @@ X-Ratelimit-Reset: 1
 
 ##### Tests
 
-![postman-tests](docs/postmanTests.png)
+<img width="1844" height="839" alt="image" src="https://github.com/user-attachments/assets/57716a19-6a67-404c-8168-80ad67a4c199" />
 
+<<<<<<< HEAD
 ![PdfGen](docs/pdfGen.png)
 
 ```bash
@@ -139,3 +140,5 @@ DB_USER=,\
 SECRET_KEY=,\
 GOTOOLCHAIN=go1.26.0+auto"
 ```
+=======
+>>>>>>> 7e725c441d03738f575d38fe2cf719a882991876
