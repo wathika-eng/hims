@@ -25,13 +25,11 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/MicahParks/keyfunc/v2 v2.1.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
-	github.com/andybalholm/brotli v1.2.7 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/platforms v0.2.1 // indirect
 	github.com/cpuguy83/dockercfg v0.3.2 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/docker v28.0.1+incompatible // indirect
 	github.com/docker/go-connections v0.5.0 // indirect
@@ -74,7 +72,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
 	github.com/philhofer/fwd v1.2.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
@@ -96,6 +93,7 @@ require (
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.54.0 // indirect
 	go.opentelemetry.io/otel v1.47.0 // indirect
+	go.opentelemetry.io/otel/log v1.47.0 // indirect
 	go.opentelemetry.io/otel/metric v1.47.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.47.0 // indirect
@@ -106,6 +104,5 @@ require (
 	golang.org/x/text v0.43.0 // indirect
 	google.golang.org/grpc v1.70.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 	mellium.im/sasl v0.3.2 // indirect
 )

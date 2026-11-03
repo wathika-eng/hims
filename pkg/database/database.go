@@ -44,7 +44,7 @@ func New(cfg config.Config) (*bun.DB, error) {
 	}
 	db := bun.NewDB(sqldb, pgdialect.New())
 	//db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
-	if err := db.DB.Ping(); err != nil {
+	if err := db.Ping(); err != nil {
 		return nil, fmt.Errorf("error while pinging the db: %v", err)
 	}
 	return db, nil

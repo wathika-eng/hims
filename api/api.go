@@ -41,7 +41,11 @@ func NewServer() {
 		log.Fatal(err)
 	}
 	// close db once we exit
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			slog.Error("failed to close database", "error", err)
+		}
+	}()
 
 	// initialize a new fiber app instance
 	app := fiber.New(fiber.Config{AppName: "HISM V1.0.0"})

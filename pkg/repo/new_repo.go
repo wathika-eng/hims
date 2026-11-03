@@ -21,7 +21,7 @@ func NewRepo(db *bun.DB) *Repo {
 
 // get the db stats
 func (r *Repo) Stats() map[string]string {
-	stats := r.db.DB.Stats()
+	stats := r.db.Stats()
 
 	return map[string]string{
 		"MaxOpenConnections": fmt.Sprintf("%d", stats.MaxOpenConnections),

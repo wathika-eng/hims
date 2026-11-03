@@ -14,13 +14,6 @@ func maskName(s string) string {
 	return string(s[0]) + "."
 }
 
-func maskID(id string) string {
-	if len(id) < 5 {
-		return id
-	}
-	return id[:2] + "****" + id[len(id)-2:]
-}
-
 func maskPhone(phone string) string {
 	if len(phone) < 7 {
 		return phone
@@ -75,19 +68,19 @@ type Patient struct {
 
 func (p Patient) MarshalJSON() ([]byte, error) {
 	type alias struct {
-		ID          int              `json:"ID"`
-		FirstName   string           `json:"firstName"`
-		LastName    string           `json:"lastName"`
-		IDNumber    string           `json:"idNumber"`
-		PhoneNumber string           `json:"phoneNumber"`
-		Gender      string           `json:"gender"`
-		Age         uint8            `json:"age"`
-		Role        string           `json:"role"`
-		DateOfBirth *time.Time       `json:"dateOfBirth"`
-		CreatedAt   time.Time        `json:"createdAt"`
-		UpdatedAt   bun.NullTime     `json:"updatedAt"`
-		DeletedAt   bun.NullTime     `json:"deletedAt"`
-		Programs    []*Program       `json:"patientPrograms"`
+		ID          int          `json:"ID"`
+		FirstName   string       `json:"firstName"`
+		LastName    string       `json:"lastName"`
+		IDNumber    string       `json:"idNumber"`
+		PhoneNumber string       `json:"phoneNumber"`
+		Gender      string       `json:"gender"`
+		Age         uint8        `json:"age"`
+		Role        string       `json:"role"`
+		DateOfBirth *time.Time   `json:"dateOfBirth"`
+		CreatedAt   time.Time    `json:"createdAt"`
+		UpdatedAt   bun.NullTime `json:"updatedAt"`
+		DeletedAt   bun.NullTime `json:"deletedAt"`
+		Programs    []*Program   `json:"patientPrograms"`
 	}
 	return json.Marshal(alias{
 		ID:          p.ID,

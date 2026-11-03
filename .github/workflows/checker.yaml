@@ -18,14 +18,14 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "1.26.x"
+          go-version: "1.27.x"
           cache: true
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
-          # Upgraded version to support Go 1.25+ syntax parsing
-          version: v1.64.6
+          # golangci-lint must be built with a Go version >= the one in go.mod
+          version: v2.15.0
           args: --timeout=5m
 
   test:
@@ -35,7 +35,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "1.26.x"
+          go-version: "1.27.x"
           # Relying on setup-go's built-in cache handling is cleaner than actions/cache@v4
           cache: true
 
